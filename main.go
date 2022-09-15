@@ -1,7 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"log"
+
+	"github.com/taiki-nd/taxi_log/config"
+	"github.com/taiki-nd/taxi_log/utils"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	// logの有効化
+	utils.Logging(config.Config.LogFile)
+	log.Println("Hello World!")
 }
