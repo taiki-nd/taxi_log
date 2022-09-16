@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/config"
 	"github.com/taiki-nd/taxi_log/db"
+	"github.com/taiki-nd/taxi_log/middleware"
 	"github.com/taiki-nd/taxi_log/routes"
 	"github.com/taiki-nd/taxi_log/utils"
 )
@@ -17,6 +18,11 @@ func main() {
 
 	// fiber
 	app := fiber.New()
+
+	// middleware
+	middleware.Cors(app)
+
+	// routes
 	routes.Routes(app)
 
 	app.Listen(":5050")
