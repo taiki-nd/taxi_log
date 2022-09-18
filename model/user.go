@@ -13,6 +13,7 @@ type User struct {
 	CloseDay        int64     `json:"close_day" gorm:"not null"`
 	DailyTarget     int64     `json:"daily_target" gorm:"not null"`
 	MonthlyTarget   int64     `json:"monthly_target" gorm:"not null"`
+	IsTax           bool      `json:"is_tax" gorm:"not null; default:false"`
 	OpenFlg         string    `json:"open_flg" gorm:"not null; size:256; default:open"`
 	IsAdmin         bool      `json:"is_admin" gorm:"not null; default:false"`
 	CreatedAt       time.Time `json:"created_at"`
