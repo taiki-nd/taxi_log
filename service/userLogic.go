@@ -2,6 +2,7 @@ package service
 
 import (
 	"log"
+	"time"
 
 	"github.com/taiki-nd/taxi_log/model"
 )
@@ -58,4 +59,19 @@ func UserValidation(user *model.User) (bool, []string) {
 	}
 
 	return true, nil
+}
+
+/**
+ * AdjustmentCloseDay
+ * 締め日の調整
+ * @params time.Time
+ * @returns time.Time
+ */
+func AdjustmentCloseDay() int64 {
+	// 今
+	now := time.Now()
+	// 次月末
+	close_day := time.Date(now.Year(), now.Month()+1, 0, 0, 0, 0, 0, time.Local)
+
+	return int64(close_day.Day())
 }
