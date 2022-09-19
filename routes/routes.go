@@ -7,5 +7,6 @@ import (
 
 func Routes(app *fiber.App) {
 	app.Get("/api/v1/users", controller.UsersIndex)
+	app.Get("/api/v1/users/:id", controller.UsersShow)
 	app.Post("/api/v1/users", controller.UsersCreate)
 }

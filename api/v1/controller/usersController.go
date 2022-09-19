@@ -17,8 +17,6 @@ import (
  * @returns error error
  */
 func UsersIndex(c *fiber.Ctx) error {
-	// 変数確認
-
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -35,6 +33,7 @@ func UsersIndex(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
+	// signin確認
 	if !statuses[0] {
 		return c.JSON(fiber.Map{
 			"info": fiber.Map{
@@ -67,6 +66,64 @@ func UsersIndex(c *fiber.Ctx) error {
 			"message": "",
 		},
 		"data": users,
+	})
+}
+
+/**
+ * UsersShow
+ * userの一覧取得
+ * @params c *fiber.Ctx
+ * @returns error error
+ */
+func UsersShow(c *fiber.Ctx) error {
+	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "user_auth_error",
+				"message": fmt.Sprintf("user auth error: %v", err),
+			},
+			"data": fiber.Map{},
+		})
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	// signin確認
+	if !statuses[0] {
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "user_not_signin",
+				"message": "user not signin",
+			},
+			"data": fiber.Map{},
+		})
+	}
+
+	// レコードの取得
+	user, err := service.GetUser(c)
+	if err != nil {
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"info": fiber.Map{
+			"status":  true,
+			"code":    "show_user_success",
+			"message": "",
+		},
+		"data": user,
 	})
 }
 

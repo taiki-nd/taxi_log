@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -125,4 +126,25 @@ func AdjustmentCloseDay() int64 {
 	close_day := time.Date(now.Year(), now.Month()+1, 0, 0, 0, 0, 0, time.Local)
 
 	return int64(close_day.Day())
+}
+
+/**
+ * GetUser
+ * user情報の取得
+ * @params c *fiber.Ctx
+ * @returns user *model.User
+ */
+func GetUser(c *fiber.Ctx) (*model.User, error) {
+	// 変数確認
+	user_id := c.Params("id")
+	var user *model.User
+
+	// レコードの取得
+	err := db.DB.Where("id = ?", user_id).First(&user).Error
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return nil, fmt.Errorf("db_error")
+	}
+
+	return user, nil
 }
