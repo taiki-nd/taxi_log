@@ -10,8 +10,39 @@ import (
 	"github.com/taiki-nd/taxi_log/service"
 )
 
+/**
+ * UsersIndex
+ * userの一覧取得
+ * @params c *fiber.Ctx
+ * @returns error error
+ */
 func UsersIndex(c *fiber.Ctx) error {
-	return c.SendString("Hello, World!")
+	// 変数確認
+
+	// user認証
+
+	// userの検索
+	users, err := service.SearchUser(c)
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"info": fiber.Map{
+			"status":  true,
+			"code":    "index_user_success",
+			"message": "",
+		},
+		"data": users,
+	})
 }
 
 /**

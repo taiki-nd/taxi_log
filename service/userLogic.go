@@ -4,9 +4,56 @@ import (
 	"log"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
 )
 
+/**
+ * SearchUser
+ * usersの検索
+ * @params c *fiber.Ctx
+ * @returns users []*models.User
+ */
+func SearchUser(c *fiber.Ctx) ([]*model.User, error) {
+	var users []*model.User
+
+	// paramsの確認
+	nickname := c.Query("nickname")
+	prefecture := c.Query("prefecture")
+	company := c.Query("company")
+	style_flg := c.Query("style_flg")
+
+	// クエリの作成
+	userSearch := db.DB.Where("")
+	if len(nickname) != 0 {
+		userSearch.Where("nickname = ?", nickname)
+	}
+	if len(prefecture) != 0 {
+		userSearch.Where("prefecture = ?", prefecture)
+	}
+	if len(company) != 0 {
+		userSearch.Where("company = ?", company)
+	}
+	if len(style_flg) != 0 {
+		userSearch.Where("style_flg = ?", style_flg)
+	}
+	// open_flgの確認
+	// usersレコードの取得
+	err := userSearch.Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+/**
+ * UserValidation
+ * userのバリデーション機能
+ * @params user *model.User
+ * @returns bool
+ * @returns []string
+ */
 func UserValidation(user *model.User) (bool, []string) {
 	var errs []string
 
