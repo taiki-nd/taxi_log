@@ -15,8 +15,9 @@ import (
  * @params c *fiber.Ctx
  * @returns users []*models.User
  */
-func SearchUser(c *fiber.Ctx) ([]*model.User, error) {
+func SearchUser(c *fiber.Ctx, adminStatus bool) ([]*model.User, error) {
 	var users []*model.User
+	log.Printf("adminStatus: %v", adminStatus)
 
 	// paramsの確認
 	nickname := c.Query("nickname")
@@ -37,6 +38,9 @@ func SearchUser(c *fiber.Ctx) ([]*model.User, error) {
 	}
 	if len(style_flg) != 0 {
 		userSearch.Where("style_flg = ?", style_flg)
+	}
+	if !adminStatus {
+		userSearch.Where("open_flg = ?", "open")
 	}
 	// open_flgの確認
 	// usersレコードの取得
