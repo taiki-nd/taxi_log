@@ -20,9 +20,34 @@ func UsersIndex(c *fiber.Ctx) error {
 	// 変数確認
 
 	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "user_auth_error",
+				"message": fmt.Sprintf("user auth error: %v", err),
+			},
+			"data": fiber.Map{},
+		})
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	if !statuses[0] {
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "user_not_signin",
+				"message": "user not signin",
+			},
+			"data": fiber.Map{},
+		})
+	}
 
 	// userの検索
-	users, err := service.SearchUser(c)
+	users, err := service.SearchUser(c, statuses[1])
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
