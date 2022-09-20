@@ -9,6 +9,7 @@ type Record struct {
 	StyleFlg      string    `json:"style_flg" gorm:"not null; size:256"`
 	StartHour     int64     `json:"start_hour" gorm:"not null"`
 	RunningTime   int64     `json:"running_time" gorm:"not null"`
+	RunningKm     int64     `json:"running_km" gorm:"not null"`
 	OccupancyRate float64   `json:"occupancy_rate" gorm:"not null"`
 	NumberOfTime  int64     `json:"number_of_time" gorm:"not null"`
 	IsTax         bool      `json:"is_tax" gorm:"not null"`
