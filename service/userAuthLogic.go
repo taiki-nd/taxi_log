@@ -104,7 +104,7 @@ func SignInCheck(c *fiber.Ctx) (bool, string) {
  */
 func UserMatchCheck(c *fiber.Ctx, authUser *AuthUser) (bool, string) {
 	// paramsの確認
-	user_id := c.Query("user_id")
+	user_id := c.Params("id")
 	user_id_int, _ := strconv.Atoi(user_id)
 
 	if len(user_id) == 0 {
