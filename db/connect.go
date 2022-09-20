@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/taiki-nd/taxi_log/config"
+	"github.com/taiki-nd/taxi_log/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -29,5 +30,9 @@ func ConnectToDb() {
 	log.Println("db connection success")
 
 	DB = db
+
+	DB.AutoMigrate(
+		model.User{},
+	)
 
 }
