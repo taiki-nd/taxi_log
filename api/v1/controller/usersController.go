@@ -293,3 +293,78 @@ func UsersUpdate(c *fiber.Ctx) error {
 		"data":   user,
 	})
 }
+
+/**
+ * UsersDelete
+ * user情報の削除
+ * @params c *fiber.Ctx
+ * @returns error
+ */
+func UsersDelete(c *fiber.Ctx) error {
+	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "user_auth_error",
+				"message": fmt.Sprintf("user auth error: %v", err),
+			},
+			"data": fiber.Map{},
+		})
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	// signin確認
+	if !statuses[0] {
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "user_not_signin",
+				"message": "user not signin",
+			},
+			"data": fiber.Map{},
+		})
+	}
+	// user合致確認
+	if !statuses[2] {
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "user_not_match",
+				"message": "user not match",
+			},
+			"data": fiber.Map{},
+		})
+	}
+
+	// userレコードの取得
+	user, err := service.GetUser(c)
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return c.JSON(fiber.Map{
+			"status": false,
+			"code":   "db_error",
+			"data":   fiber.Map{},
+		})
+	}
+
+	// user情報の削除
+	errUser := db.DB.Delete(user).Error
+	if errUser != nil {
+		log.Printf("db error: %v", err)
+		return c.JSON(fiber.Map{
+			"status": false,
+			"code":   "db_error",
+			"data":   fiber.Map{},
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"status": true,
+		"code":   "delete_user_success",
+		"data":   fiber.Map{},
+	})
+}
