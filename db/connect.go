@@ -32,6 +32,7 @@ func ConnectToDb() {
 	DB = db
 
 	DB.AutoMigrate(
+		model.Record{},
 		model.User{},
 	)
 
