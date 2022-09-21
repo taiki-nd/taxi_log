@@ -16,6 +16,7 @@ type User struct {
 	IsTax           bool      `json:"is_tax" gorm:"not null; default:false"`
 	OpenFlg         string    `json:"open_flg" gorm:"not null; size:256; default:open"`
 	IsAdmin         bool      `json:"is_admin" gorm:"not null; default:false"`
+	Records         []Record  `json:"records" gorm:"foreignKey:UserId"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }

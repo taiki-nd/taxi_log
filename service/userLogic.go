@@ -40,10 +40,10 @@ func SearchUser(c *fiber.Ctx, adminStatus bool) ([]*model.User, error) {
 	if len(style_flg) != 0 {
 		userSearch.Where("style_flg = ?", style_flg)
 	}
+	// open_flgの確認
 	if !adminStatus {
 		userSearch.Where("open_flg = ?", "open")
 	}
-	// open_flgの確認
 	// usersレコードの取得
 	err := userSearch.Find(&users).Error
 	if err != nil {
@@ -116,8 +116,7 @@ func UserValidation(user *model.User) (bool, []string) {
 /**
  * AdjustmentCloseDay
  * 締め日の調整
- * @params time.Time
- * @returns time.Time
+ * @returns int64
  */
 func AdjustmentCloseDay() int64 {
 	// 今
@@ -141,6 +140,32 @@ func GetUser(c *fiber.Ctx) (*model.User, error) {
 
 	// レコードの取得
 	err := db.DB.Where("id = ?", user_id).First(&user).Error
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return nil, fmt.Errorf("db_error")
+	}
+
+	return user, nil
+}
+
+/**
+ * GetUserFromUuid
+ * uuidからuser情報を取得
+ * @params c *fiber.Ctx
+ * @returns *model.User
+ */
+func GetUserFromUuid(c *fiber.Ctx) (*model.User, error) {
+	// headerの確認
+	var header AuthUser
+	err := c.ReqHeaderParser(&header)
+	if err != nil {
+		log.Println("reqHeader parse error")
+		return nil, fmt.Errorf("reqHeader_parse_error")
+	}
+	uuid := header.Uuid
+
+	var user *model.User
+	err = db.DB.Where("uuid = ?", uuid).First(&user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return nil, fmt.Errorf("db_error")
