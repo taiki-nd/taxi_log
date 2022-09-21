@@ -359,16 +359,19 @@ func RecordsDelete(c *fiber.Ctx) error {
 			"data": fiber.Map{},
 		})
 	}
-	// user合致確認
-	if !statuses[2] {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_not_match",
-				"message": "user not match",
-			},
-			"data": fiber.Map{},
-		})
+	// admin権限の確認
+	if !statuses[1] {
+		// user合致確認
+		if !statuses[2] {
+			return c.JSON(fiber.Map{
+				"info": fiber.Map{
+					"status":  false,
+					"code":    "user_not_match",
+					"message": "user not match",
+				},
+				"data": fiber.Map{},
+			})
+		}
 	}
 
 	// recordレコードの取得
