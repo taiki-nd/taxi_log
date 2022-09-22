@@ -246,9 +246,12 @@ func UsersUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
@@ -257,9 +260,12 @@ func UsersUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("body parse error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "body_parse_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
@@ -281,16 +287,22 @@ func UsersUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
 	return c.JSON(fiber.Map{
-		"status": true,
-		"code":   "update_user_success",
-		"data":   user,
+		"info": fiber.Map{
+			"status":  true,
+			"code":    "update_user_success",
+			"message": fmt.Sprintf("db error: %v", err),
+		},
+		"data": user,
 	})
 }
 
@@ -348,9 +360,26 @@ func UsersDelete(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
+		})
+	}
+
+	// トランザクション開始
+	err = db.DB.Transaction(service.UsersDeleteTransaction)
+	if err != nil {
+		log.Printf("transaction error: %v", err)
+		return c.JSON(fiber.Map{
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "transaction_error",
+				"message": fmt.Sprintf("transaction error: %v", err),
+			},
+			"data": user,
 		})
 	}
 
@@ -359,15 +388,21 @@ func UsersDelete(c *fiber.Ctx) error {
 	if errUser != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
 	return c.JSON(fiber.Map{
-		"status": true,
-		"code":   "delete_user_success",
-		"data":   fiber.Map{},
+		"info": fiber.Map{
+			"status":  true,
+			"code":    "delete_user_success",
+			"message": "",
+		},
+		"data": fiber.Map{},
 	})
 }
