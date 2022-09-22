@@ -369,9 +369,11 @@ func UsersDelete(c *fiber.Ctx) error {
 		})
 	}
 
-	// トランザクション開始
-	err = db.DB.Transaction(service.UsersDeleteTransaction)
+	// user削除トランザクション開始
+	tx := db.DB.Begin()
+	err = service.UsersDeleteTransaction(tx, user)
 	if err != nil {
+		tx.Rollback()
 		log.Printf("transaction error: %v", err)
 		return c.JSON(fiber.Map{
 			"info": fiber.Map{
@@ -382,20 +384,7 @@ func UsersDelete(c *fiber.Ctx) error {
 			"data": user,
 		})
 	}
-
-	// user情報の削除
-	errUser := db.DB.Delete(user).Error
-	if errUser != nil {
-		log.Printf("db error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
-	}
+	tx.Commit()
 
 	return c.JSON(fiber.Map{
 		"info": fiber.Map{
