@@ -277,9 +277,12 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
@@ -288,9 +291,12 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("body parse error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "body_parse_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "body_parse_error",
+				"message": fmt.Sprintf("body parse error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
@@ -312,16 +318,22 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
 	return c.JSON(fiber.Map{
-		"status": true,
-		"code":   "update_record_success",
-		"data":   record,
+		"info": fiber.Map{
+			"status":  true,
+			"code":    "update_record_success",
+			"message": "",
+		},
+		"data": record,
 	})
 }
 
@@ -379,9 +391,12 @@ func RecordsDelete(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
@@ -390,15 +405,21 @@ func RecordsDelete(c *fiber.Ctx) error {
 	if errRecord != nil {
 		log.Printf("db error: %v", err)
 		return c.JSON(fiber.Map{
-			"status": false,
-			"code":   "db_error",
-			"data":   fiber.Map{},
+			"info": fiber.Map{
+				"status":  false,
+				"code":    "db_error",
+				"message": fmt.Sprintf("db error: %v", err),
+			},
+			"data": fiber.Map{},
 		})
 	}
 
 	return c.JSON(fiber.Map{
-		"status": true,
-		"code":   "delete_record_success",
-		"data":   fiber.Map{},
+		"info": fiber.Map{
+			"status":  true,
+			"code":    "create_delete_success",
+			"message": "",
+		},
+		"data": fiber.Map{},
 	})
 }
