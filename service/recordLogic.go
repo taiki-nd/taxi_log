@@ -19,7 +19,7 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 	var records []*model.Record
 
 	// paramsの確認
-	data := c.Query("data")
+	date := c.Query("date")
 	day_of_week := c.Query("day_of_week")
 	style_flg := c.Query("style_flg")
 	occupancy_rate := c.Query("occupancy_rate")
@@ -27,8 +27,8 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 
 	// クエリの作成
 	recordSearch := db.DB.Where("")
-	if len(data) != 0 {
-		recordSearch.Where("data = ?", data)
+	if len(date) != 0 {
+		recordSearch.Where("date = ?", date)
 	}
 	if len(day_of_week) != 0 {
 		recordSearch.Where("day_of_week = ?", day_of_week)
