@@ -15,6 +15,7 @@ type Record struct {
 	IsTax         bool      `json:"is_tax" gorm:"not null"`
 	DailySales    int64     `json:"daily_sales" gorm:"not null"`
 	UserId        uint      `json:"user_id"`
+	Details       []Detail  `json:"details" gorm:"foreignKey:RecordId"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
