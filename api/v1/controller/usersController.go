@@ -21,52 +21,24 @@ func UsersIndex(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_auth_error",
-				"message": fmt.Sprintf("user auth error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_auth_error", fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_not_signin",
-				"message": "user not signin",
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_not_signin", "user not sign in")
 	}
 
 	// userの検索
 	users, err := service.SearchUser(c, statuses[1])
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
-	return c.JSON(fiber.Map{
-		"info": fiber.Map{
-			"status":  true,
-			"code":    "index_user_success",
-			"message": "",
-		},
-		"data": users,
-	})
+	return service.SuccessResponse(c, "index_user_success", users)
 }
 
 /**
@@ -80,51 +52,23 @@ func UsersShow(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_auth_error",
-				"message": fmt.Sprintf("user auth error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_auth_error", fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_not_signin",
-				"message": "user not signin",
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_not_signin", "user not signin")
 	}
 
 	// レコードの取得
 	user, err := service.GetUser(c)
 	if err != nil {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
-	return c.JSON(fiber.Map{
-		"info": fiber.Map{
-			"status":  true,
-			"code":    "show_user_success",
-			"message": "",
-		},
-		"data": user,
-	})
+	return service.SuccessResponse(c, "show_user_success", user)
 }
 
 /**
@@ -143,27 +87,13 @@ func UsersCreate(c *fiber.Ctx) error {
 	err := c.BodyParser(&user)
 	if err != nil {
 		log.Printf("body parse error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "body_parse_error",
-				"message": fmt.Sprintf("body parse error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "body_parse_error", fmt.Sprintf("body parse error: %v", err))
 	}
 
 	// バリデーション
 	_, errs := service.UserValidation(user)
 	if len(errs) != 0 {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    errs,
-				"message": fmt.Sprintf("validation error: %v", errs),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, errs, fmt.Sprintf("validation error: %v", errs))
 	}
 
 	// close_dayが31の場合の締め日の調整
@@ -176,24 +106,10 @@ func UsersCreate(c *fiber.Ctx) error {
 	err = db.DB.Create(&user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
-	return c.JSON(fiber.Map{
-		"info": fiber.Map{
-			"status":  true,
-			"code":    "create_user_success",
-			"message": "",
-		},
-		"data": user,
-	})
+	return service.SuccessResponse(c, "create_user_success", user)
 }
 
 /**
@@ -206,104 +122,48 @@ func UsersUpdate(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_auth_error",
-				"message": fmt.Sprintf("user auth error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_auth_error", fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_not_signin",
-				"message": "user not signin",
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_not_signin", "user not signin")
 	}
 	// user合致確認
 	if !statuses[2] {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_not_match",
-				"message": "user not match",
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_not_match", "user not match")
 	}
 
 	// userレコードの取得
 	user, err := service.GetUser(c)
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
 	// リクエストボディのパース
 	err = c.BodyParser(user)
 	if err != nil {
 		log.Printf("body parse error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
 	// バリデーション
 	_, errs = service.UserValidation(user)
 	if len(errs) != 0 {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    errs,
-				"message": fmt.Sprintf("validation error: %v", errs),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, errs, fmt.Sprintf("validation error: %v", errs))
 	}
 
 	// user情報の更新
 	err = db.DB.Model(&user).Updates(user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
-	return c.JSON(fiber.Map{
-		"info": fiber.Map{
-			"status":  true,
-			"code":    "update_user_success",
-			"message": fmt.Sprintf("db error: %v", err),
-		},
-		"data": user,
-	})
+	return service.SuccessResponse(c, "update_user_success", user)
 }
 
 /**
@@ -317,41 +177,20 @@ func UsersDelete(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_auth_error",
-				"message": fmt.Sprintf("user auth error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_auth_error", fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "user_not_signin",
-				"message": "user not signin",
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "user_not_signin", "user not signin")
 	}
 	// admin権限の確認
 	if !statuses[1] {
 		// user合致確認
 		if !statuses[2] {
-			return c.JSON(fiber.Map{
-				"info": fiber.Map{
-					"status":  false,
-					"code":    "user_not_match",
-					"message": "user not match",
-				},
-				"data": fiber.Map{},
-			})
+			return service.ErrorResponse(c, "user_not_match", "user not match")
 		}
 	}
 
@@ -359,14 +198,7 @@ func UsersDelete(c *fiber.Ctx) error {
 	user, err := service.GetUser(c)
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "db_error",
-				"message": fmt.Sprintf("db error: %v", err),
-			},
-			"data": fiber.Map{},
-		})
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
 	// user削除トランザクション開始
@@ -375,23 +207,9 @@ func UsersDelete(c *fiber.Ctx) error {
 	if err != nil {
 		tx.Rollback()
 		log.Printf("transaction error: %v", err)
-		return c.JSON(fiber.Map{
-			"info": fiber.Map{
-				"status":  false,
-				"code":    "transaction_error",
-				"message": fmt.Sprintf("transaction error: %v", err),
-			},
-			"data": user,
-		})
+		return service.ErrorResponse(c, "transaction_error", fmt.Sprintf("transaction error: %v", err))
 	}
 	tx.Commit()
 
-	return c.JSON(fiber.Map{
-		"info": fiber.Map{
-			"status":  true,
-			"code":    "delete_user_success",
-			"message": "",
-		},
-		"data": fiber.Map{},
-	})
+	return service.SuccessResponse(c, "delete_user_success", nil)
 }
