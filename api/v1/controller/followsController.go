@@ -3,12 +3,59 @@ package controller
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
 	"github.com/taiki-nd/taxi_log/service"
 )
+
+/**
+ * Followings
+ * フォロー一覧の表示
+ */
+func Followings(c *fiber.Ctx) error {
+	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return service.SuccessResponse(c, "user_auth_error", fmt.Sprintf("user auth error: %v", err))
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	// signin確認
+	if !statuses[0] {
+		return service.ErrorResponse(c, "record_not_signin", "record not signin")
+	}
+	// user合致確認
+	if !statuses[2] {
+		return service.ErrorResponse(c, "user_not_match", "user not match")
+	}
+
+	// 変数確認
+	user_id_str := c.Query("user_id")
+	user_id, _ := strconv.Atoi(user_id_str)
+
+	// フォロイングのid一覧を取得する
+	var following_ids []uint
+	err = db.DB.Table("user_followings").Where("user_id = ?", uint(user_id)).Pluck("following_id", &following_ids).Error
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
+	}
+
+	// followingsの情報の取得
+	var followings []*service.Follow
+	err = db.DB.Table("users").Where("id IN (?)", following_ids).Find(&followings).Error
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
+	}
+
+	return service.SuccessResponse(c, "show_followings_success", followings)
+}
 
 /**
  * Follow
