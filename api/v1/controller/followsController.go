@@ -148,3 +148,44 @@ func Follow(c *fiber.Ctx) error {
 
 	return service.SuccessResponse(c, "follow_user_success", follow)
 }
+
+/*
+ * DeleteFollowing
+ * フォロー解除
+ * @params c *fiber.Ctx
+ * @returns error
+ */
+func DeleteFollowing(c *fiber.Ctx) error {
+	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return service.SuccessResponse(c, "user_auth_error", fmt.Sprintf("user auth error: %v", err))
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	// signin確認
+	if !statuses[0] {
+		return service.ErrorResponse(c, "record_not_signin", "record not signin")
+	}
+	// user合致確認
+	if !statuses[2] {
+		return service.ErrorResponse(c, "user_not_match", "user not match")
+	}
+
+	// 変数確認
+	user_id_str := c.Query("user_id")
+	user_id, _ := strconv.Atoi(user_id_str)
+	following_id_str := c.Query("following_id")
+	following_id, _ := strconv.Atoi(following_id_str)
+
+	// レコードの削除
+	err = db.DB.Table("user_followings").Where("following_id = ?", uint(following_id)).Where("user_id = ?", uint(user_id)).Delete("").Error
+	if err != nil {
+		log.Printf("db_error: %v", err)
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db_error: %v", err))
+	}
+
+	return service.SuccessResponse(c, "delete_following_success", nil)
+}
