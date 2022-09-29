@@ -19,6 +19,7 @@ func Routes(app *fiber.App) {
 	app.Get("/api/v1/followings", controller.Followings)
 	app.Get("/api/v1/followers", controller.Followers)
 	app.Delete("/api/v1/followings", controller.DeleteFollowing)
+	app.Post("/api/v1/follow_permission", controller.FollowPermission)
 
 	// record
 	app.Get("/api/v1/records", controller.RecordsIndex)

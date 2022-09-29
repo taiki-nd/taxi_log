@@ -189,3 +189,55 @@ func DeleteFollowing(c *fiber.Ctx) error {
 
 	return service.SuccessResponse(c, "delete_following_success", nil)
 }
+
+/**
+ * FollowPermission
+ * フォロー承認機能
+ * @params c *fiber.Ctx
+ * @returns error
+ */
+func FollowPermission(c *fiber.Ctx) error {
+	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return service.SuccessResponse(c, "user_auth_error", fmt.Sprintf("user auth error: %v", err))
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	// signin確認
+	if !statuses[0] {
+		return service.ErrorResponse(c, "record_not_signin", "record not signin")
+	}
+	// user合致確認
+	if !statuses[2] {
+		return service.ErrorResponse(c, "user_not_match", "user not match")
+	}
+
+	// 変数確認
+	var user_following model.UserFollowing
+	user_id_str := c.Query("user_id")
+	user_id, _ := strconv.Atoi(user_id_str)
+	following_id_str := c.Query("following_id")
+	following_id, _ := strconv.Atoi(following_id_str)
+
+	// 対象レコードの取得
+	err = db.DB.Where("following_id = ?", uint(user_id)).Where("user_id = ?", uint(following_id)).First(&user_following).Error
+	if err != nil {
+		log.Printf("db_error: %v", err)
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db_error: %v", err))
+	}
+
+	// permissionの付与
+	user_following.Permission = true
+
+	// レコードの更新
+	err = db.DB.Where("following_id = ?", uint(user_id)).Where("user_id = ?", uint(following_id)).Model(&user_following).Updates(user_following).Error
+	if err != nil {
+		log.Printf("db_error: %v", err)
+		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db_error: %v", err))
+	}
+
+	return service.SuccessResponse(c, "permission_update_success", user_following)
+}
