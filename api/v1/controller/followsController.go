@@ -230,10 +230,15 @@ func FollowPermission(c *fiber.Ctx) error {
 	}
 
 	// permissionの付与
-	user_following.Permission = true
+	update_user_following := map[string]interface{}{
+		"id":           user_following.Id,
+		"user_id":      user_following.UserId,
+		"following_id": user_following.FollowingId,
+		"permission":   !user_following.Permission,
+	}
 
 	// レコードの更新
-	err = db.DB.Where("following_id = ?", uint(user_id)).Where("user_id = ?", uint(following_id)).Model(&user_following).Updates(user_following).Error
+	err = db.DB.Model(&user_following).Updates(update_user_following).Error
 	if err != nil {
 		log.Printf("db_error: %v", err)
 		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db_error: %v", err))
