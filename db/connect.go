@@ -34,6 +34,7 @@ func ConnectToDb() {
 	DB.AutoMigrate(
 		model.Detail{},
 		model.Record{},
+		model.UserFollowing{},
 		model.User{},
 	)
 
