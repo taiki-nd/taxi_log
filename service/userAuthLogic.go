@@ -61,7 +61,6 @@ func UserAuth(c *fiber.Ctx) ([]bool, []string, error) {
 
 		// user合致確認
 		match_status, err_match := UserMatchCheck(c, authUser)
-		log.Printf("match_status: %v", match_status)
 		if err_match != "" {
 			log.Printf("user match check error: %v", err_match)
 			statuses = append(statuses, match_status)
