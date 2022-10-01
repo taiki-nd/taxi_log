@@ -15,10 +15,16 @@ func UsersDeleteTransaction(tx *gorm.DB, user *model.User) error {
 		log.Printf("transaction delete record err: %v", errRecord)
 		return fmt.Errorf("transaction_delete_record_err")
 	}
+	// follow関連の削除
+	errFollow := tx.Table("user_followings").Where("user_id = ?", user.Id).Or("following_id = ?", user.Id).Delete("").Error
+	if errFollow != nil {
+		log.Printf("transaction delete follow err: %v", errFollow)
+		return fmt.Errorf("transaction_delete_follow_err")
+	}
 	// userの削除
 	errUser := tx.Delete(user).Error
 	if errUser != nil {
-		log.Printf("transaction delete user err: %v", errRecord)
+		log.Printf("transaction delete user err: %v", errUser)
 		return fmt.Errorf("transaction_delete_user_err")
 	}
 	return nil
