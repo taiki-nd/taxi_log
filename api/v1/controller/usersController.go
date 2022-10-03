@@ -70,7 +70,7 @@ func UsersShow(c *fiber.Ctx) error {
 			return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 		}
 		if !status {
-			return service.ErrorResponse(c, "follow_relationship_error", fmt.Sprintf("follow relationship error"))
+			return service.ErrorResponse(c, "follow_relationship_error", "follow relationship error")
 		}
 	}
 
