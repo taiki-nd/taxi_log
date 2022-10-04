@@ -62,6 +62,18 @@ func UsersShow(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, "user_not_signin", "user not signin")
 	}
 
+	// admin権限の確認
+	if !statuses[1] {
+		// follower確認
+		status, err := service.IsFollower(c)
+		if err != nil {
+			return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
+		}
+		if !status {
+			return service.ErrorResponse(c, "follow_relationship_error", "follow relationship error")
+		}
+	}
+
 	// レコードの取得
 	user, err := service.GetUser(c)
 	if err != nil {
