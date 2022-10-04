@@ -72,6 +72,18 @@ func RecordsShow(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
 	}
 
+	// admin権限の確認
+	if !statuses[1] {
+		// follower確認
+		status, err := service.IsFollowerForRecord(c, record)
+		if err != nil {
+			return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
+		}
+		if !status {
+			return service.ErrorResponse(c, "follow_relationship_error", "follow relationship error")
+		}
+	}
+
 	return service.SuccessResponse(c, "show_record_success", record)
 }
 
