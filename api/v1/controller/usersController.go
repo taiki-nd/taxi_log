@@ -168,8 +168,24 @@ func UsersUpdate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, errs, fmt.Sprintf("validation error: %v", errs))
 	}
 
+	update_user := map[string]interface{}{
+		"id":                user.Id,
+		"uuid":              user.Uuid,
+		"nickname":          user.Nickname,
+		"profile_image_url": user.ProfileImageUrl,
+		"prefecture":        user.Prefecture,
+		"company":           user.Company,
+		"style_flg":         user.StyleFlg,
+		"close_day":         user.CloseDay,
+		"daily_target":      user.DailyTarget,
+		"monthly_target":    user.MonthlyTarget,
+		"is_tax":            user.IsTax,
+		"open_flg":          user.OpenFlg,
+		"is_admin":          user.IsAdmin,
+	}
+
 	// user情報の更新
-	err = db.DB.Model(&user).Updates(user).Error
+	err = db.DB.Model(&user).Updates(update_user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
