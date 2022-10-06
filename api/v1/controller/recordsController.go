@@ -178,8 +178,23 @@ func RecordsUpdate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, errs, fmt.Sprintf("validation error: %v", errs))
 	}
 
+	update_record := map[string]interface{}{
+		"id":             record.Id,
+		"data":           record.Data,
+		"day_of_week":    record.DayOfWeek,
+		"style_flg":      record.StyleFlg,
+		"start_hour":     record.StartHour,
+		"running_time":   record.RunningTime,
+		"running_km":     record.RunningKm,
+		"occupancy_rate": record.OccupancyRate,
+		"number_of_time": record.NumberOfTime,
+		"is_tax":         record.IsTax,
+		"daily_sales":    record.DailySales,
+		"user_id":        record.UserId,
+	}
+
 	// record情報の更新
-	err = db.DB.Model(&record).Updates(record).Error
+	err = db.DB.Model(&record).Updates(update_record).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))

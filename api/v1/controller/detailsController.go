@@ -166,8 +166,19 @@ func DetailsUpdate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, errs, fmt.Sprintf("validation error: %v", errs))
 	}
 
+	update_detail := map[string]interface{}{
+		"id":           detail.Id,
+		"depart_Hour":  detail.DepartHour,
+		"depart_place": detail.DepartPlace,
+		"arrive_place": detail.ArrivePlace,
+		"is_tax":       detail.IsTax,
+		"sales":        detail.Sales,
+		"method_flg":   detail.MethodFlg,
+		"description":  detail.Description,
+	}
+
 	// detail情報の更新
-	err = db.DB.Model(&detail).Updates(detail).Error
+	err = db.DB.Model(&detail).Updates(update_detail).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
 		return service.ErrorResponse(c, "db_error", fmt.Sprintf("db error: %v", err))
