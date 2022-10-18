@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/taiki-nd/taxi_log/api/v1/controller"
+	controller "github.com/taiki-nd/taxi_log/controller/api/v1"
 )
 
 func Routes(app *fiber.App) {
