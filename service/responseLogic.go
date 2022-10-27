@@ -9,7 +9,7 @@ import "github.com/gofiber/fiber/v2"
  * @params code string
  * @params message string
  */
-func ErrorResponse(c *fiber.Ctx, code interface{}, message string) error {
+func ErrorResponse(c *fiber.Ctx, code []string, message string) error {
 	c.JSON(fiber.Map{
 		"info": fiber.Map{
 			"status":  false,
@@ -28,7 +28,7 @@ func ErrorResponse(c *fiber.Ctx, code interface{}, message string) error {
  * @params code string
  * @params message string
  */
-func SuccessResponse(c *fiber.Ctx, code string, data interface{}) error {
+func SuccessResponse(c *fiber.Ctx, code []string, data interface{}) error {
 	c.JSON(fiber.Map{
 		"info": fiber.Map{
 			"status":  true,

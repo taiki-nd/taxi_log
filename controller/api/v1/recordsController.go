@@ -22,24 +22,24 @@ func RecordsIndex(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.ErrorResponse(c, constants.USER_AUTH_ERROR, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, constants.USER_NOT_SIGININ, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
 	}
 
 	// recordの検索
 	records, err := service.SearchRecord(c, statuses[1])
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, "index_record_success", records)
+	return service.SuccessResponse(c, []string{"index_record_success"}, records)
 }
 
 /**
@@ -53,24 +53,24 @@ func RecordsShow(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.ErrorResponse(c, constants.USER_AUTH_ERROR, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, constants.USER_NOT_SIGININ, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
 	}
 	// user合致確認
 	if !statuses[2] {
-		return service.ErrorResponse(c, constants.USER_NOT_MATCH, "user not match")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_MATCH}, "user not match")
 	}
 
 	// レコードの取得
 	record, err := service.GetRecord(c)
 	if err != nil {
-		return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
 	// admin権限の確認
@@ -78,14 +78,14 @@ func RecordsShow(c *fiber.Ctx) error {
 		// follower確認
 		status, err := service.IsFollowerForRecord(c, record)
 		if err != nil {
-			return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+			return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 		}
 		if !status {
-			return service.ErrorResponse(c, constants.FOLLOW_RELATIONSHIP_ERROR, "follow relationship error")
+			return service.ErrorResponse(c, []string{constants.FOLLOW_RELATIONSHIP_ERROR}, "follow relationship error")
 		}
 	}
 
-	return service.SuccessResponse(c, "show_record_success", record)
+	return service.SuccessResponse(c, []string{"show_record_success"}, record)
 }
 
 /**
@@ -102,21 +102,21 @@ func RecordsCreate(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.ErrorResponse(c, constants.USER_AUTH_ERROR, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, constants.USER_NOT_SIGININ, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
 	}
 
 	// リクエストボディーのパース
 	err = c.BodyParser(&record)
 	if err != nil {
 		log.Printf("body parse error: %v", err)
-		return service.ErrorResponse(c, constants.BODY_PARSE_ERROR, fmt.Sprintf("body parse error: %v", err))
+		return service.ErrorResponse(c, []string{constants.BODY_PARSE_ERROR}, fmt.Sprintf("body parse error: %v", err))
 	}
 
 	// バリデーション
@@ -129,10 +129,10 @@ func RecordsCreate(c *fiber.Ctx) error {
 	err = db.DB.Create(&record).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, "create_record_success", record)
+	return service.SuccessResponse(c, []string{"create_record_success"}, record)
 }
 
 /**
@@ -145,32 +145,32 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.SuccessResponse(c, constants.USER_AUTH_ERROR, fmt.Sprintf("user auth error: %v", err))
+		return service.SuccessResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, "record_not_signin", "record not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "record not signin")
 	}
 	// user合致確認
 	if !statuses[2] {
-		return service.ErrorResponse(c, constants.USER_NOT_MATCH, "user not match")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_MATCH}, "user not match")
 	}
 
 	// recordレコードの取得
 	record, err := service.GetRecord(c)
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
 	// リクエストボディのパース
 	err = c.BodyParser(record)
 	if err != nil {
 		log.Printf("body parse error: %v", err)
-		return service.ErrorResponse(c, constants.BODY_PARSE_ERROR, fmt.Sprintf("body parse error: %v", err))
+		return service.ErrorResponse(c, []string{constants.BODY_PARSE_ERROR}, fmt.Sprintf("body parse error: %v", err))
 	}
 
 	// バリデーション
@@ -198,10 +198,10 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	err = db.DB.Model(&record).Updates(update_record).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, "update_record_success", record)
+	return service.SuccessResponse(c, []string{"update_record_success"}, record)
 }
 
 /**
@@ -215,20 +215,20 @@ func RecordsDelete(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.ErrorResponse(c, constants.USER_AUTH_ERROR, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
 	// signin確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, constants.USER_NOT_SIGININ, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
 	}
 	// admin権限の確認
 	if !statuses[1] {
 		// user合致確認
 		if !statuses[2] {
-			return service.ErrorResponse(c, constants.USER_NOT_MATCH, "user not match")
+			return service.ErrorResponse(c, []string{constants.USER_NOT_MATCH}, "user not match")
 		}
 	}
 
@@ -236,15 +236,15 @@ func RecordsDelete(c *fiber.Ctx) error {
 	record, err := service.GetRecord(c)
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
 	// record情報の削除
 	errRecord := db.DB.Delete(record).Error
 	if errRecord != nil {
 		log.Printf("db error: %v", err)
-		return service.ErrorResponse(c, constants.DB_ERR, fmt.Sprintf("db error: %v", err))
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, "create_delete_success", nil)
+	return service.SuccessResponse(c, []string{"create_delete_success"}, nil)
 }

@@ -79,10 +79,11 @@ func RecordValidation(record *model.Record) (bool, []string) {
 	if len(record.StyleFlg) == 0 {
 		log.Println("style_flg null error")
 		errs = append(errs, "style_flg_null_error")
-	}
-	if !(record.StyleFlg == "every_other_day" || record.StyleFlg == "day" || record.StyleFlg == "night" || record.StyleFlg == "other") {
-		log.Println("specified word error(style_flg)")
-		errs = append(errs, "specified_word_error(style_flg)")
+	} else {
+		if !(record.StyleFlg == "every_other_day" || record.StyleFlg == "day" || record.StyleFlg == "night" || record.StyleFlg == "other") {
+			log.Println("specified word error(style_flg)")
+			errs = append(errs, "specified_word_error(style_flg)")
+		}
 	}
 
 	// errの出力

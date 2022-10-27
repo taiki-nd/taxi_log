@@ -93,10 +93,11 @@ func DetailValidation(detail *model.Detail) (bool, []string) {
 	if len(detail.MethodFlg) == 0 {
 		log.Println("method_flg null error")
 		errs = append(errs, "method_flg_null_error")
-	}
-	if !(detail.MethodFlg == "flow" || detail.MethodFlg == "wait" || detail.MethodFlg == "app" || detail.MethodFlg == "wireless" || detail.MethodFlg == "own" || detail.MethodFlg == "other") {
-		log.Println("specified word error(method_flg)")
-		errs = append(errs, "specified_word_error(method_flg)")
+	} else {
+		if !(detail.MethodFlg == "flow" || detail.MethodFlg == "wait" || detail.MethodFlg == "app" || detail.MethodFlg == "wireless" || detail.MethodFlg == "own" || detail.MethodFlg == "other") {
+			log.Println("specified word error(method_flg)")
+			errs = append(errs, "specified_word_error(method_flg)")
+		}
 	}
 
 	// errの出力
