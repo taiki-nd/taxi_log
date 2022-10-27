@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
+	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
 /**
@@ -107,7 +108,7 @@ func GetRecord(c *fiber.Ctx) (*model.Record, error) {
 	err := db.DB.Where("id = ?", record_id).First(&record).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf("db_error")
+		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	return record, nil

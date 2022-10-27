@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
+	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
 /**
@@ -142,7 +143,7 @@ func GetUser(c *fiber.Ctx) (*model.User, error) {
 	err := db.DB.Where("id = ?", user_id).First(&user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf("db_error")
+		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	return user, nil
@@ -168,7 +169,7 @@ func GetUserFromUuid(c *fiber.Ctx) (*model.User, error) {
 	err = db.DB.Where("uuid = ?", uuid).First(&user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf("db_error")
+		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	return user, nil
