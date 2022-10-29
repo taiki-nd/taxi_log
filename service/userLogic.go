@@ -62,11 +62,24 @@ func SearchUser(c *fiber.Ctx, adminStatus bool) ([]*model.User, error) {
  */
 func UserValidation(user *model.User) (bool, []string) {
 	var errs []string
+	var searchedUser []*model.User
+
+	// uuid検索
+	err := db.DB.Table("users").Where("uuid = ?", user.Uuid).Find(&searchedUser).Error
+	if err != nil {
+		errs = append(errs, "db_error")
+	}
 
 	// uuid
 	if len(user.Uuid) == 0 {
 		log.Println("uuid null error")
 		errs = append(errs, "uuid_null_error")
+	}
+	// uuid重複チェック
+	if user.Id == 0 {
+		if len(searchedUser) != 0 {
+			errs = append(errs, "uuid_duplicate_error")
+		}
 	}
 	//nickname
 	if len(user.Nickname) == 0 {
