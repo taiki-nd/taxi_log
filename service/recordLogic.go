@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
+	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
 /**
@@ -78,10 +79,11 @@ func RecordValidation(record *model.Record) (bool, []string) {
 	if len(record.StyleFlg) == 0 {
 		log.Println("style_flg null error")
 		errs = append(errs, "style_flg_null_error")
-	}
-	if !(record.StyleFlg == "every_other_day" || record.StyleFlg == "day" || record.StyleFlg == "night" || record.StyleFlg == "other") {
-		log.Println("specified word error(style_flg)")
-		errs = append(errs, "specified_word_error(style_flg)")
+	} else {
+		if !(record.StyleFlg == "every_other_day" || record.StyleFlg == "day" || record.StyleFlg == "night" || record.StyleFlg == "other") {
+			log.Println("specified word error(style_flg)")
+			errs = append(errs, "specified_word_error(style_flg)")
+		}
 	}
 
 	// errの出力
@@ -107,7 +109,7 @@ func GetRecord(c *fiber.Ctx) (*model.Record, error) {
 	err := db.DB.Where("id = ?", record_id).First(&record).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf("db_error")
+		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	return record, nil
