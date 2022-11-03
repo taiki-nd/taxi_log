@@ -4,7 +4,7 @@ import "time"
 
 type Record struct {
 	Id            uint      `json:"id" gorm:"primaryKey"`
-	Data          time.Time `json:"data" gorm:"not null"`
+	Date          time.Time `json:"date" gorm:"not null"`
 	DayOfWeek     string    `json:"day_of_week" gorm:"not null; size:10"`
 	StyleFlg      string    `json:"style_flg" gorm:"not null; size:256"`
 	StartHour     int64     `json:"start_hour" gorm:"not null"`
