@@ -86,6 +86,42 @@ func RecordValidation(record *model.Record) (bool, []string) {
 		}
 	}
 
+	// start_hour
+	if record.StartHour < 0 || 24 < record.StartHour {
+		log.Println("start hour number error")
+		errs = append(errs, "start_hour_number_error")
+	}
+
+	// running_time
+	if record.RunningTime < 0 || 24 < record.RunningTime {
+		log.Println("running time number error")
+		errs = append(errs, "running_time_number_error")
+	}
+
+	// running_km
+	if record.RunningKm < 0 {
+		log.Println("running km number error")
+		errs = append(errs, "running_km_number_error")
+	}
+
+	// number_of_time
+	if record.NumberOfTime < 0 {
+		log.Println("number of time number error")
+		errs = append(errs, "number_of_time_number_error")
+	}
+
+	// occupancy_rate
+	if record.OccupancyRate < 0 || 100 < record.OccupancyRate {
+		log.Println("occupancy rate number error")
+		errs = append(errs, "occupancy_rate_number_error")
+	}
+
+	// daily_sales
+	if record.DailySales < 0 {
+		log.Println("daily sales number error")
+		errs = append(errs, "daily_sales_number_error")
+	}
+
 	// errの出力
 	if len(errs) != 0 {
 		return false, errs
