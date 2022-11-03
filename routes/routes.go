@@ -13,6 +13,7 @@ func Routes(app *fiber.App) {
 	app.Post("/api/v1/users", controller.UsersCreate)
 	app.Put("/api/v1/users/:id", controller.UsersUpdate)
 	app.Delete("/api/v1/users/:id", controller.UsersDelete)
+	app.Get("/api/v1/user/get_user_form_uid", controller.GetUserFromUuid)
 
 	// follow
 	app.Post("/api/v1/follow", controller.Follow)

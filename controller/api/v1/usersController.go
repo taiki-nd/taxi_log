@@ -242,3 +242,18 @@ func UsersDelete(c *fiber.Ctx) error {
 
 	return service.SuccessResponse(c, []string{"delete_user_success"}, nil)
 }
+
+/**
+ * GetUserFromUuid
+ * uuidからuser情報の取得
+ * @params c *fiber.Ctx
+ */
+func GetUserFromUuid(c *fiber.Ctx) error {
+	user, err := service.GetUserFromUuid(c)
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+	}
+
+	return service.SuccessResponse(c, []string{"get_user_form_uuid_success"}, user)
+}
