@@ -21,7 +21,7 @@ func Followings(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.SuccessResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
@@ -55,7 +55,7 @@ func Followings(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"show_followings_success"}, followings)
+	return service.SuccessResponse(c, []string{"show_followings_success"}, followings, nil)
 }
 
 /**
@@ -69,7 +69,7 @@ func Followers(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.SuccessResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
@@ -103,7 +103,7 @@ func Followers(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"show_followers_success"}, users)
+	return service.SuccessResponse(c, []string{"show_followers_success"}, users, nil)
 }
 
 /**
@@ -117,7 +117,7 @@ func Follow(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.SuccessResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
@@ -147,7 +147,7 @@ func Follow(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"follow_user_success"}, follow)
+	return service.SuccessResponse(c, []string{"follow_user_success"}, follow, nil)
 }
 
 /*
@@ -161,7 +161,7 @@ func DeleteFollowing(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.SuccessResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
@@ -188,7 +188,7 @@ func DeleteFollowing(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db_error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"delete_following_success"}, nil)
+	return service.SuccessResponse(c, []string{"delete_following_success"}, nil, nil)
 }
 
 /**
@@ -202,7 +202,7 @@ func FollowPermission(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.SuccessResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
@@ -245,5 +245,5 @@ func FollowPermission(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db_error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"permission_update_success"}, user_following)
+	return service.SuccessResponse(c, []string{"permission_update_success"}, user_following, nil)
 }

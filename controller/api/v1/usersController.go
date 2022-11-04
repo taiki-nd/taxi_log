@@ -39,7 +39,7 @@ func UsersIndex(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"index_user_success"}, users)
+	return service.SuccessResponse(c, []string{"index_user_success"}, users, nil)
 }
 
 /**
@@ -81,7 +81,7 @@ func UsersShow(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"show_user_success"}, user)
+	return service.SuccessResponse(c, []string{"show_user_success"}, user, nil)
 }
 
 /**
@@ -122,7 +122,7 @@ func UsersCreate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"create_user_success"}, user)
+	return service.SuccessResponse(c, []string{"create_user_success"}, user, nil)
 }
 
 /**
@@ -192,7 +192,7 @@ func UsersUpdate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"update_user_success"}, user)
+	return service.SuccessResponse(c, []string{"update_user_success"}, user, nil)
 }
 
 /**
@@ -240,7 +240,7 @@ func UsersDelete(c *fiber.Ctx) error {
 	}
 	tx.Commit()
 
-	return service.SuccessResponse(c, []string{"delete_user_success"}, nil)
+	return service.SuccessResponse(c, []string{"delete_user_success"}, nil, nil)
 }
 
 /**
@@ -255,5 +255,5 @@ func GetUserFromUuid(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"get_user_form_uuid_success"}, user)
+	return service.SuccessResponse(c, []string{"get_user_form_uuid_success"}, user, nil)
 }
