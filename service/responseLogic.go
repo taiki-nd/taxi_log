@@ -28,7 +28,7 @@ func ErrorResponse(c *fiber.Ctx, code []string, message string) error {
  * @params code string
  * @params message string
  */
-func SuccessResponse(c *fiber.Ctx, code []string, data interface{}) error {
+func SuccessResponse(c *fiber.Ctx, code []string, data interface{}, meta interface{}) error {
 	c.JSON(fiber.Map{
 		"info": fiber.Map{
 			"status":  true,
@@ -36,6 +36,7 @@ func SuccessResponse(c *fiber.Ctx, code []string, data interface{}) error {
 			"message": "",
 		},
 		"data": data,
+		"meta": meta,
 	})
 	return c.SendStatus(fiber.StatusOK)
 }

@@ -3,6 +3,8 @@ package controller
 import (
 	"fmt"
 	"log"
+	"math"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
@@ -39,7 +41,19 @@ func RecordsIndex(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"index_record_success"}, records)
+	// pagination
+	var total int64
+	db.DB.Model(&model.Record{}).Count(&total)
+	limit := constants.PAGINATION_LIMIT
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	lastPage := math.Ceil(float64(total) / float64(limit))
+	meta := &model.Meta{
+		Total:    total,
+		Page:     page,
+		LastPage: lastPage,
+	}
+
+	return service.SuccessResponse(c, []string{"index_record_success"}, records, meta)
 }
 
 /**
@@ -85,7 +99,7 @@ func RecordsShow(c *fiber.Ctx) error {
 		}
 	}
 
-	return service.SuccessResponse(c, []string{"show_record_success"}, record)
+	return service.SuccessResponse(c, []string{"show_record_success"}, record, nil)
 }
 
 /**
@@ -132,7 +146,7 @@ func RecordsCreate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"create_record_success"}, record)
+	return service.SuccessResponse(c, []string{"create_record_success"}, record, nil)
 }
 
 /**
@@ -145,7 +159,7 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
 		log.Printf("user auth error: %v", err)
-		return service.SuccessResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
 	}
 	if len(errs) != 0 {
 		log.Println(errs)
@@ -201,7 +215,7 @@ func RecordsUpdate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"update_record_success"}, record)
+	return service.SuccessResponse(c, []string{"update_record_success"}, record, nil)
 }
 
 /**
@@ -246,5 +260,5 @@ func RecordsDelete(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"create_delete_success"}, nil)
+	return service.SuccessResponse(c, []string{"create_delete_success"}, nil, nil)
 }

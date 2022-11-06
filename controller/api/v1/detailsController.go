@@ -39,7 +39,7 @@ func DetailsIndex(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"index_detail_success"}, details)
+	return service.SuccessResponse(c, []string{"index_detail_success"}, details, nil)
 }
 
 /**
@@ -73,7 +73,7 @@ func DetailsShow(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"show_detail_success"}, detail)
+	return service.SuccessResponse(c, []string{"show_detail_success"}, detail, nil)
 }
 
 /**
@@ -120,7 +120,7 @@ func DetailsCreate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"create_detail_success"}, detail)
+	return service.SuccessResponse(c, []string{"create_detail_success"}, detail, nil)
 }
 
 /**
@@ -185,7 +185,7 @@ func DetailsUpdate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"update_detail_success"}, detail)
+	return service.SuccessResponse(c, []string{"update_detail_success"}, detail, nil)
 }
 
 /**
@@ -230,5 +230,5 @@ func DetailsDelete(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"create_delete_success"}, nil)
+	return service.SuccessResponse(c, []string{"create_delete_success"}, nil, nil)
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
@@ -52,8 +53,13 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 		recordSearch.Where("user_id = ?", user.Id)
 	}
 
+	// pagination
+	limit := constants.PAGINATION_LIMIT
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	offset := (page - 1) * limit
+
 	// recordsレコードの取得
-	err = recordSearch.Find(&records).Error
+	err = recordSearch.Offset(offset).Limit(limit).Find(&records).Error
 	if err != nil {
 		return nil, err
 	}
