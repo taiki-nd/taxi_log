@@ -3,10 +3,12 @@ package service
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
+	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
 /**
@@ -51,8 +53,13 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 		recordSearch.Where("user_id = ?", user.Id)
 	}
 
+	// pagination
+	limit := constants.PAGINATION_LIMIT
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	offset := (page - 1) * limit
+
 	// recordsレコードの取得
-	err = recordSearch.Find(&records).Error
+	err = recordSearch.Offset(offset).Limit(limit).Find(&records).Error
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +85,47 @@ func RecordValidation(record *model.Record) (bool, []string) {
 	if len(record.StyleFlg) == 0 {
 		log.Println("style_flg null error")
 		errs = append(errs, "style_flg_null_error")
+	} else {
+		if !(record.StyleFlg == "every_other_day" || record.StyleFlg == "day" || record.StyleFlg == "night" || record.StyleFlg == "other") {
+			log.Println("specified word error(style_flg)")
+			errs = append(errs, "specified_word_error(style_flg)")
+		}
 	}
-	if !(record.StyleFlg == "every_other_day" || record.StyleFlg == "day" || record.StyleFlg == "night" || record.StyleFlg == "other") {
-		log.Println("specified word error(style_flg)")
-		errs = append(errs, "specified_word_error(style_flg)")
+
+	// start_hour
+	if record.StartHour < 0 || 24 < record.StartHour {
+		log.Println("start hour number error")
+		errs = append(errs, "start_hour_number_error")
+	}
+
+	// running_time
+	if record.RunningTime < 0 || 24 < record.RunningTime {
+		log.Println("running time number error")
+		errs = append(errs, "running_time_number_error")
+	}
+
+	// running_km
+	if record.RunningKm < 0 {
+		log.Println("running km number error")
+		errs = append(errs, "running_km_number_error")
+	}
+
+	// number_of_time
+	if record.NumberOfTime < 0 {
+		log.Println("number of time number error")
+		errs = append(errs, "number_of_time_number_error")
+	}
+
+	// occupancy_rate
+	if record.OccupancyRate < 0 || 100 < record.OccupancyRate {
+		log.Println("occupancy rate number error")
+		errs = append(errs, "occupancy_rate_number_error")
+	}
+
+	// daily_sales
+	if record.DailySales < 0 {
+		log.Println("daily sales number error")
+		errs = append(errs, "daily_sales_number_error")
 	}
 
 	// errの出力
@@ -107,7 +151,7 @@ func GetRecord(c *fiber.Ctx) (*model.Record, error) {
 	err := db.DB.Where("id = ?", record_id).First(&record).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf("db_error")
+		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	return record, nil

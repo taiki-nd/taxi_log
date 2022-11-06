@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
+	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
 /**
@@ -61,21 +62,36 @@ func SearchUser(c *fiber.Ctx, adminStatus bool) ([]*model.User, error) {
  */
 func UserValidation(user *model.User) (bool, []string) {
 	var errs []string
+	var searchedUser []*model.User
+
+	// uuid検索
+	err := db.DB.Table("users").Where("uuid = ?", user.Uuid).Find(&searchedUser).Error
+	if err != nil {
+		errs = append(errs, "db_error")
+	}
 
 	// uuid
 	if len(user.Uuid) == 0 {
 		log.Println("uuid null error")
 		errs = append(errs, "uuid_null_error")
 	}
+	// uuid重複チェック
+	if user.Id == 0 {
+		if len(searchedUser) != 0 {
+			errs = append(errs, "uuid_duplicate_error")
+		}
+	}
 	//nickname
 	if len(user.Nickname) == 0 {
 		log.Println("nickname null error")
 		errs = append(errs, "nickname_null_error")
+	} else {
+		if len(user.Nickname) < 3 || 30 < len(user.Nickname) {
+			log.Println("nickname letter count error")
+			errs = append(errs, "nickname_letter_count_error")
+		}
 	}
-	if len(user.Nickname) < 3 || 30 < len(user.Nickname) {
-		log.Println("nickname letter count error")
-		errs = append(errs, "nickname_letter_count_error")
-	}
+
 	// prefecture
 	if len(user.Prefecture) == 0 {
 		log.Println("prefecture null error")
@@ -90,16 +106,14 @@ func UserValidation(user *model.User) (bool, []string) {
 	if len(user.StyleFlg) == 0 {
 		log.Println("style_flg null error")
 		errs = append(errs, "style_flg_null_error")
+	} else {
+		if !(user.StyleFlg == "every_other_day" || user.StyleFlg == "day" || user.StyleFlg == "night" || user.StyleFlg == "other") {
+			log.Println("specified word error(style_flg)")
+			errs = append(errs, "specified_word_error(style_flg)")
+		}
 	}
-	if !(user.StyleFlg == "every_other_day" || user.StyleFlg == "day" || user.StyleFlg == "night" || user.StyleFlg == "other") {
-		log.Println("specified word error(style_flg)")
-		errs = append(errs, "specified_word_error(style_flg)")
-	}
+
 	// close_day
-	if user.CloseDay == 0 {
-		log.Println("close_day error")
-		errs = append(errs, "close_day_error")
-	}
 	if user.CloseDay < 1 || 31 < user.CloseDay {
 		log.Println("close_day date error")
 		errs = append(errs, "close_day_date_error")
@@ -142,7 +156,7 @@ func GetUser(c *fiber.Ctx) (*model.User, error) {
 	err := db.DB.Where("id = ?", user_id).First(&user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf("db_error")
+		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	return user, nil
@@ -168,7 +182,7 @@ func GetUserFromUuid(c *fiber.Ctx) (*model.User, error) {
 	err = db.DB.Where("uuid = ?", uuid).First(&user).Error
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf("db_error")
+		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	return user, nil
