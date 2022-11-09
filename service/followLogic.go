@@ -49,6 +49,11 @@ func IsFollowerForRecord(c *fiber.Ctx, record *model.Record) (bool, error) {
 	recorded_user_id := record.UserId
 	var follow model.UserFollowing
 
+	// 本人の場合follower判定を行わない
+	if signin_user.Id == recorded_user_id {
+		return true, nil
+	}
+
 	// follow関係の確認
 	err := db.DB.Table("user_followings").Where("user_id = ?", signin_user.Id).Where("following_id = ?", recorded_user_id).Where("permission = ?", true).First(&follow).Error
 	if err != nil {
