@@ -195,7 +195,7 @@ func RecordsUpdate(c *fiber.Ctx) error {
 
 	update_record := map[string]interface{}{
 		"id":             record.Id,
-		"data":           record.Date,
+		"date":           record.Date,
 		"day_of_week":    record.DayOfWeek,
 		"style_flg":      record.StyleFlg,
 		"start_hour":     record.StartHour,
