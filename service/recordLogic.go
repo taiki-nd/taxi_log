@@ -59,7 +59,7 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 	offset := (page - 1) * limit
 
 	// recordsレコードの取得
-	err = recordSearch.Offset(offset).Limit(limit).Find(&records).Error
+	err = recordSearch.Order("date desc").Offset(offset).Limit(limit).Find(&records).Error
 	if err != nil {
 		return nil, err
 	}
