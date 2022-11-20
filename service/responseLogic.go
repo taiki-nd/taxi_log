@@ -40,3 +40,23 @@ func SuccessResponse(c *fiber.Ctx, code []string, data interface{}, meta interfa
 	})
 	return c.SendStatus(fiber.StatusOK)
 }
+
+/**
+ * SuccessResponseAnalysis
+ * error時のレスポンス内容
+ * @params c *fiber.Ctx
+ * @params code string
+ * @params message string
+ */
+func SuccessResponseAnalysis(c *fiber.Ctx, code []string, data interface{}, meta interface{}) error {
+	c.JSON(fiber.Map{
+		"info": fiber.Map{
+			"status":  true,
+			"code":    code,
+			"message": "",
+		},
+		"data":   data,
+		"labels": meta,
+	})
+	return c.SendStatus(fiber.StatusOK)
+}
