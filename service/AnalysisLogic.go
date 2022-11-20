@@ -24,7 +24,14 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, error) {
 		return nil, fmt.Errorf(constants.DB_ERR)
 	}
 
-	return sales, nil
+	var sales_sums []int64
+	var i int64 = 0
+	for _, daily_sales := range sales {
+		i += daily_sales
+		sales_sums = append(sales_sums, i)
+	}
+
+	return sales_sums, nil
 }
 
 /**
