@@ -11,17 +11,17 @@ import (
 	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
-func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, error) {
+func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, error) {
 	log.Println("DataSettingForSalesSum")
 
 	// params
 	//user_id, _ := strconv.Atoi(c.Query("user_id"))
 
 	// 日報売上一覧の取得
-	sales, err := GetSalesIndex(c)
+	sales, dates, err := GetSalesIndex(c)
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, fmt.Errorf(constants.DB_ERR)
+		return nil, nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	var sales_sums []int64
@@ -31,7 +31,7 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, error) {
 		sales_sums = append(sales_sums, i)
 	}
 
-	return sales_sums, nil
+	return sales_sums, dates, nil
 }
 
 /**
@@ -41,7 +41,7 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, error) {
  * @return []int64
  * @return error
  */
-func GetSalesIndex(c *fiber.Ctx) ([]int64, error) {
+func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 	// params
 	user_id, _ := strconv.Atoi(c.Query("user_id"))
 	year, _ := strconv.Atoi(c.Query("year"))
@@ -50,7 +50,7 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, error) {
 	// 締め日の取得
 	user, err := GetUserFromUuid(c)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	close_day := user.CloseDay
 	if user.CloseDay == 31 {
@@ -69,9 +69,15 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, error) {
 	var sales []int64
 	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Pluck("daily_sales", &sales).Error
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return sales, nil
+	var dates []time.Time
+	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Pluck("date", &dates).Error
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return sales, dates, nil
 
 }

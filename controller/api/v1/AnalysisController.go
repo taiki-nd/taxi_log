@@ -35,13 +35,10 @@ func AnalysisSalesSum(c *fiber.Ctx) error {
 	}
 
 	// データ収集
-	sales_data, err := service.DataSettingForSalesSum(c)
+	sales_data, dates, err := service.DataSettingForSalesSum(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	// 仮データ
-	labels := []string{"a", "b", "c"}
-
-	return service.SuccessResponseAnalysis(c, []string{"analysis_success"}, sales_data, labels)
+	return service.SuccessResponseAnalysis(c, []string{"analysis_success"}, sales_data, dates)
 }
