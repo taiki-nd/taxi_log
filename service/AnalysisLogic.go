@@ -43,12 +43,14 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, error) {
  */
 func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 	// params
-	user_id, _ := strconv.Atoi(c.Query("user_id"))
 	year, _ := strconv.Atoi(c.Query("year"))
 	month, _ := strconv.Atoi(c.Query("month"))
 
-	// 締め日の取得
 	user, err := GetUserFromUuid(c)
+	// user_idの取得
+	user_id := user.Id
+
+	// 締め日の取得
 	if err != nil {
 		return nil, nil, err
 	}

@@ -26,13 +26,6 @@ func AnalysisSalesSum(c *fiber.Ctx) error {
 	if !statuses[0] {
 		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
 	}
-	// admin権限の確認
-	if !statuses[1] {
-		// user合致確認
-		if !statuses[2] {
-			return service.ErrorResponse(c, []string{constants.USER_NOT_MATCH}, "user not match")
-		}
-	}
 
 	// データ収集
 	sales_data, dates, err := service.DataSettingForSalesSum(c)
