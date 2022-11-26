@@ -38,4 +38,5 @@ func Routes(app *fiber.App) {
 
 	// analysis
 	app.Get("/api/v1/analysis/sales_sum", controller.AnalysisSalesSum)
+	app.Get("/api/v1/analysis/sales", controller.AnalysisSales)
 }
