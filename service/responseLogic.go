@@ -26,7 +26,8 @@ func ErrorResponse(c *fiber.Ctx, code []string, message string) error {
  * error時のレスポンス内容
  * @params c *fiber.Ctx
  * @params code string
- * @params message string
+ * @params data interface{}
+ * @params meta interface{}
  */
 func SuccessResponse(c *fiber.Ctx, code []string, data interface{}, meta interface{}) error {
 	c.JSON(fiber.Map{

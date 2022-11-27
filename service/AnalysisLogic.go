@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
+	"github.com/taiki-nd/taxi_log/model"
 	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
@@ -47,13 +48,14 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 	month, _ := strconv.Atoi(c.Query("month"))
 
 	user, err := GetUserFromUuid(c)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// user_idの取得
 	user_id := user.Id
 
 	// 締め日の取得
-	if err != nil {
-		return nil, nil, err
-	}
 	close_day := user.CloseDay
 	if user.CloseDay == 31 {
 		date := AdjustmentCloseDay()
@@ -82,4 +84,47 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 
 	return sales, dates, nil
 
+}
+
+/**
+ * SearchRecordForMonth
+ * recordsの検索
+ * @params c *fiber.Ctx
+ * @returns records []*models.Record
+ */
+func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
+	// params
+	year, _ := strconv.Atoi(c.Query("year"))
+	month, _ := strconv.Atoi(c.Query("month"))
+
+	user, err := GetUserFromUuid(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// user_idの取得
+	user_id := user.Id
+
+	// 締め日の取得
+	close_day := user.CloseDay
+	if user.CloseDay == 31 {
+		date := AdjustmentCloseDay()
+		close_day = date
+	}
+	sales_period_start := time.Date(year, time.Month(month), int(close_day), 12, 0, 0, 0, time.Local)
+	if month >= 12 {
+		year += 1
+		month = 1
+	} else {
+		month += 1
+	}
+	sales_period_finish := time.Date(year, time.Month(month), int(close_day), 12, 0, 0, 0, time.Local)
+
+	var records []*model.Record
+	err = db.DB.Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Find(&records).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return records, nil
 }
