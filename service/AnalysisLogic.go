@@ -56,19 +56,26 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 	user_id := user.Id
 
 	// 締め日の取得
-	close_day := user.CloseDay
+	close_day_start := user.CloseDay
 	if user.CloseDay == 31 {
-		date := AdjustmentCloseDay()
-		close_day = date
+		date := AdjustmentCloseDay(year, month)
+		close_day_start = date
 	}
-	sales_period_start := time.Date(year, time.Month(month), int(close_day), 12, 0, 0, 0, time.Local)
-	if month >= 12 {
+	sales_period_start := time.Date(year, time.Month(month), int(close_day_start), 12, 0, 0, 0, time.Local)
+
+	if month == 12 {
 		year += 1
 		month = 1
 	} else {
 		month += 1
 	}
-	sales_period_finish := time.Date(year, time.Month(month), int(close_day), 12, 0, 0, 0, time.Local)
+
+	close_day_finish := user.CloseDay
+	if user.CloseDay == 31 {
+		date := AdjustmentCloseDay(year, month)
+		close_day_finish = date
+	}
+	sales_period_finish := time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
 
 	var sales []int64
 	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Pluck("daily_sales", &sales).Error
@@ -108,7 +115,7 @@ func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
 	// 締め日の取得
 	close_day := user.CloseDay
 	if user.CloseDay == 31 {
-		date := AdjustmentCloseDay()
+		date := AdjustmentCloseDay(year, month)
 		close_day = date
 	}
 	sales_period_start := time.Date(year, time.Month(month), int(close_day), 12, 0, 0, 0, time.Local)
