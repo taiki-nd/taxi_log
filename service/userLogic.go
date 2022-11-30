@@ -133,16 +133,7 @@ func UserValidation(user *model.User) (bool, []string) {
  * @returns int64
  */
 func AdjustmentCloseDay(year int, month int) int64 {
-	var close_day time.Time
-	if month == 12 {
-		year += 1
-		month = 1
-		close_day = time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
-	} else {
-		month += 1
-		close_day = time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
-	}
-
+	close_day := time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
 	return int64(close_day.Day())
 }
 
