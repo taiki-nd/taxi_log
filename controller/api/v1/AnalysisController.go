@@ -86,7 +86,6 @@ func GetRecords(c *fiber.Ctx) error {
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
-	log.Println(records)
 
 	return service.SuccessResponse(c, []string{"success_get_records"}, records, nil)
 }
