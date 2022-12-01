@@ -109,12 +109,6 @@ func UsersCreate(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, errs, fmt.Sprintf("validation error: %v", errs))
 	}
 
-	// close_dayが31の場合の締め日の調整
-	if user.CloseDay == 31 {
-		date := service.AdjustmentCloseDay()
-		user.CloseDay = date
-	}
-
 	// レコード作成
 	err = db.DB.Create(&user).Error
 	if err != nil {
