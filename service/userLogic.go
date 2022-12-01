@@ -132,12 +132,8 @@ func UserValidation(user *model.User) (bool, []string) {
  * 締め日の調整
  * @returns int64
  */
-func AdjustmentCloseDay() int64 {
-	// 今
-	now := time.Now()
-	// 次月末
-	close_day := time.Date(now.Year(), now.Month()+1, 0, 0, 0, 0, 0, time.Local)
-
+func AdjustmentCloseDay(year int, month int) int64 {
+	close_day := time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
 	return int64(close_day.Day())
 }
 

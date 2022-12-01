@@ -11,6 +11,7 @@ type User struct {
 	Company         string          `json:"company" gorm:"not null; size:256"`
 	StyleFlg        string          `json:"style_flg" gorm:"not null; size:256"`
 	CloseDay        int64           `json:"close_day" gorm:"not null"`
+	PayDay          int64           `json:"pay_day" gorm:"not null"`
 	DailyTarget     int64           `json:"daily_target" gorm:"not null"`
 	MonthlyTarget   int64           `json:"monthly_target" gorm:"not null"`
 	IsTax           bool            `json:"is_tax" gorm:"not null; default:false"`

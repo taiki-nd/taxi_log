@@ -230,5 +230,5 @@ func DetailsDelete(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	return service.SuccessResponse(c, []string{"create_delete_success"}, nil, nil)
+	return service.SuccessResponse(c, []string{"delete_detail_success"}, nil, nil)
 }
