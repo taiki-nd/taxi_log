@@ -119,6 +119,12 @@ func UserValidation(user *model.User) (bool, []string) {
 		errs = append(errs, "close_day_date_error")
 	}
 
+	// pay_day
+	if user.PayDay < 1 || 31 < user.PayDay {
+		log.Println("pay_day date error")
+		errs = append(errs, "pay_day_date_error")
+	}
+
 	// errの出力
 	if len(errs) != 0 {
 		return false, errs
