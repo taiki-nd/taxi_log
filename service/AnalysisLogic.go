@@ -230,6 +230,16 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, error) {
 	return average_sales_per_day, nil
 }
 
+type SalesIndex struct {
+	Monday    []int64
+	Tuesday   []int64
+	Wednesday []int64
+	Thursday  []int64
+	Friday    []int64
+	Saturday  []int64
+	Sunday    []int64
+}
+
 /**
  * AnalysisAverageSalesPerDay
  * 曜日別平均売上の取得
@@ -237,91 +247,87 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, error) {
  * @returns
  */
 func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time, user_id uint) (interface{}, error) {
-	// 期間対象レコードの取得
-	var records_monday_sales []int64
-	err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, "Mon.").Order("date asc").Pluck("daily_sales", &records_monday_sales).Error
-	if err != nil {
-		return nil, err
+	type salesIndex struct {
+		Monday    []int64
+		Tuesday   []int64
+		Wednesday []int64
+		Thursday  []int64
+		Friday    []int64
+		Saturday  []int64
+		Sunday    []int64
 	}
 
-	var records_tuesday_sales []int64
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, "Tue.").Order("date asc").Pluck("daily_sales", &records_tuesday_sales).Error
-	if err != nil {
-		return nil, err
-	}
+	var sales_index salesIndex
 
-	var records_wednesday_sales []int64
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, "Wed.").Order("date asc").Pluck("daily_sales", &records_wednesday_sales).Error
-	if err != nil {
-		return nil, err
-	}
+	day_of_week := []string{"Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."}
 
-	var records_thursday_sales []int64
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, "Thu.").Order("date asc").Pluck("daily_sales", &records_thursday_sales).Error
-	if err != nil {
-		return nil, err
-	}
-
-	var records_friday_sales []int64
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, "Fri.").Order("date asc").Pluck("daily_sales", &records_friday_sales).Error
-	if err != nil {
-		return nil, err
-	}
-
-	var records_saturday_sales []int64
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, "Sat.").Order("date asc").Pluck("daily_sales", &records_saturday_sales).Error
-	if err != nil {
-		return nil, err
-	}
-
-	var records_sunday_sales []int64
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, "Sun.").Order("date asc").Pluck("daily_sales", &records_sunday_sales).Error
-	if err != nil {
-		return nil, err
+	// 曜日別対象期間のレコードの売上取得
+	for i, day := range day_of_week {
+		var records_sales []int64
+		err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, day).Order("date asc").Pluck("daily_sales", &records_sales).Error
+		if err != nil {
+			return nil, err
+		}
+		switch i {
+		case 0:
+			sales_index.Monday = records_sales
+		case 1:
+			sales_index.Tuesday = records_sales
+		case 2:
+			sales_index.Wednesday = records_sales
+		case 3:
+			sales_index.Thursday = records_sales
+		case 4:
+			sales_index.Friday = records_sales
+		case 5:
+			sales_index.Saturday = records_sales
+		case 6:
+			sales_index.Sunday = records_sales
+		}
 	}
 
 	// 曜日別平均値の取得
 	var analysis_average_sales_per_day []int64
 
 	var monday_sales_sum int64 = 0
-	for _, sales := range records_monday_sales {
-		monday_sales_sum += sales
-	}
-	if len(records_monday_sales) != 0 {
-		monday_sales_average := monday_sales_sum / int64(len(records_monday_sales))
+	if len(sales_index.Monday) != 0 {
+		for _, sales := range sales_index.Monday {
+			monday_sales_sum += sales
+		}
+		monday_sales_average := monday_sales_sum / int64(len(sales_index.Monday))
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, monday_sales_average)
 	} else {
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
 	}
 
 	var tuesday_sales_sum int64 = 0
-	for _, sales := range records_tuesday_sales {
-		tuesday_sales_sum += sales
-	}
-	if len(records_tuesday_sales) != 0 {
-		tuesday_sales_average := tuesday_sales_sum / int64(len(records_tuesday_sales))
+	if len(sales_index.Tuesday) != 0 {
+		for _, sales := range sales_index.Tuesday {
+			tuesday_sales_sum += sales
+		}
+		tuesday_sales_average := tuesday_sales_sum / int64(len(sales_index.Tuesday))
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, tuesday_sales_average)
 	} else {
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
 	}
 
 	var wednesday_sales_sum int64 = 0
-	for _, sales := range records_wednesday_sales {
-		wednesday_sales_sum += sales
-	}
-	if len(records_wednesday_sales) != 0 {
-		wednesday_sales_average := wednesday_sales_sum / int64(len(records_wednesday_sales))
+	if len(sales_index.Wednesday) != 0 {
+		for _, sales := range sales_index.Wednesday {
+			wednesday_sales_sum += sales
+		}
+		wednesday_sales_average := wednesday_sales_sum / int64(len(sales_index.Wednesday))
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, wednesday_sales_average)
 	} else {
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
 	}
 
 	var thursday_sales_sum int64 = 0
-	for _, sales := range records_thursday_sales {
-		thursday_sales_sum += sales
-	}
-	if len(records_thursday_sales) != 0 {
-		thursday_sales_average := thursday_sales_sum / int64(len(records_thursday_sales))
+	if len(sales_index.Thursday) != 0 {
+		for _, sales := range sales_index.Thursday {
+			thursday_sales_sum += sales
+		}
+		thursday_sales_average := thursday_sales_sum / int64(len(sales_index.Thursday))
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, thursday_sales_average)
 	} else {
 		fmt.Println("here")
@@ -329,33 +335,33 @@ func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time,
 	}
 
 	var friday_sales_sum int64 = 0
-	for _, sales := range records_friday_sales {
-		friday_sales_sum += sales
-	}
-	if len(records_friday_sales) != 0 {
-		friday_sales_average := friday_sales_sum / int64(len(records_friday_sales))
+	if len(sales_index.Friday) != 0 {
+		for _, sales := range sales_index.Friday {
+			friday_sales_sum += sales
+		}
+		friday_sales_average := friday_sales_sum / int64(len(sales_index.Friday))
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, friday_sales_average)
 	} else {
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
 	}
 
 	var saturday_sales_sum int64 = 0
-	for _, sales := range records_saturday_sales {
-		saturday_sales_sum += sales
-	}
-	if len(records_saturday_sales) != 0 {
-		saturday_sales_average := saturday_sales_sum / int64(len(records_saturday_sales))
+	if len(sales_index.Saturday) != 0 {
+		for _, sales := range sales_index.Saturday {
+			saturday_sales_sum += sales
+		}
+		saturday_sales_average := saturday_sales_sum / int64(len(sales_index.Saturday))
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, saturday_sales_average)
 	} else {
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
 	}
 
 	var sunday_sales_sum int64 = 0
-	for _, sales := range records_sunday_sales {
-		sunday_sales_sum += sales
-	}
-	if len(records_sunday_sales) != 0 {
-		sunday_sales_average := sunday_sales_sum / int64(len(records_sunday_sales))
+	if len(sales_index.Sunday) != 0 {
+		for _, sales := range sales_index.Sunday {
+			sunday_sales_sum += sales
+		}
+		sunday_sales_average := sunday_sales_sum / int64(len(sales_index.Sunday))
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, sunday_sales_average)
 	} else {
 		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
