@@ -247,124 +247,34 @@ type SalesIndex struct {
  * @returns
  */
 func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time, user_id uint) (interface{}, error) {
-	type salesIndex struct {
-		Monday    []int64
-		Tuesday   []int64
-		Wednesday []int64
-		Thursday  []int64
-		Friday    []int64
-		Saturday  []int64
-		Sunday    []int64
-	}
-
-	var sales_index salesIndex
-
 	day_of_week := []string{"Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."}
 
+	// all_sales_index =[[月曜の売上一覧], [火曜の売上一覧]...]
+	var all_sales_index [][]int64
+
 	// 曜日別対象期間のレコードの売上取得
-	for i, day := range day_of_week {
+	for _, day := range day_of_week {
 		var records_sales []int64
 		err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, day).Order("date asc").Pluck("daily_sales", &records_sales).Error
 		if err != nil {
 			return nil, err
 		}
-		switch i {
-		case 0:
-			sales_index.Monday = records_sales
-		case 1:
-			sales_index.Tuesday = records_sales
-		case 2:
-			sales_index.Wednesday = records_sales
-		case 3:
-			sales_index.Thursday = records_sales
-		case 4:
-			sales_index.Friday = records_sales
-		case 5:
-			sales_index.Saturday = records_sales
-		case 6:
-			sales_index.Sunday = records_sales
-		}
+		all_sales_index = append(all_sales_index, records_sales)
 	}
 
 	// 曜日別平均値の取得
 	var analysis_average_sales_per_day []int64
 
-	var monday_sales_sum int64 = 0
-	if len(sales_index.Monday) != 0 {
-		for _, sales := range sales_index.Monday {
-			monday_sales_sum += sales
+	for _, day_of_sales := range all_sales_index { // all_sales_index =[[月曜の売上一覧], [火曜の売上一覧]...]
+		var sales_sum int64 = 0
+		if len(day_of_sales) != 0 { // day_of_sales = [曜日毎の売上一覧]
+			for _, sales := range day_of_sales {
+				sales_sum += sales
+			}
+			// 曜日毎の売上平均の取得
+			sales_average := sales_sum / int64(len(day_of_sales))
+			analysis_average_sales_per_day = append(analysis_average_sales_per_day, sales_average)
 		}
-		monday_sales_average := monday_sales_sum / int64(len(sales_index.Monday))
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, monday_sales_average)
-	} else {
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
-	}
-
-	var tuesday_sales_sum int64 = 0
-	if len(sales_index.Tuesday) != 0 {
-		for _, sales := range sales_index.Tuesday {
-			tuesday_sales_sum += sales
-		}
-		tuesday_sales_average := tuesday_sales_sum / int64(len(sales_index.Tuesday))
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, tuesday_sales_average)
-	} else {
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
-	}
-
-	var wednesday_sales_sum int64 = 0
-	if len(sales_index.Wednesday) != 0 {
-		for _, sales := range sales_index.Wednesday {
-			wednesday_sales_sum += sales
-		}
-		wednesday_sales_average := wednesday_sales_sum / int64(len(sales_index.Wednesday))
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, wednesday_sales_average)
-	} else {
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
-	}
-
-	var thursday_sales_sum int64 = 0
-	if len(sales_index.Thursday) != 0 {
-		for _, sales := range sales_index.Thursday {
-			thursday_sales_sum += sales
-		}
-		thursday_sales_average := thursday_sales_sum / int64(len(sales_index.Thursday))
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, thursday_sales_average)
-	} else {
-		fmt.Println("here")
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
-	}
-
-	var friday_sales_sum int64 = 0
-	if len(sales_index.Friday) != 0 {
-		for _, sales := range sales_index.Friday {
-			friday_sales_sum += sales
-		}
-		friday_sales_average := friday_sales_sum / int64(len(sales_index.Friday))
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, friday_sales_average)
-	} else {
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
-	}
-
-	var saturday_sales_sum int64 = 0
-	if len(sales_index.Saturday) != 0 {
-		for _, sales := range sales_index.Saturday {
-			saturday_sales_sum += sales
-		}
-		saturday_sales_average := saturday_sales_sum / int64(len(sales_index.Saturday))
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, saturday_sales_average)
-	} else {
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
-	}
-
-	var sunday_sales_sum int64 = 0
-	if len(sales_index.Sunday) != 0 {
-		for _, sales := range sales_index.Sunday {
-			sunday_sales_sum += sales
-		}
-		sunday_sales_average := sunday_sales_sum / int64(len(sales_index.Sunday))
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, sunday_sales_average)
-	} else {
-		analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
 	}
 
 	return analysis_average_sales_per_day, nil
