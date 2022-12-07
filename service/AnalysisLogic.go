@@ -243,7 +243,9 @@ type SalesIndex struct {
 /**
  * AnalysisAverageSalesPerDay
  * 曜日別平均売上の取得
- * @params c *fiber.Ctx
+ * @params period_start time.Time
+ * @params period_finish time.Time
+ * @params user_id uint
  * @returns
  */
 func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time, user_id uint) (interface{}, error) {
