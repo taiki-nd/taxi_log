@@ -303,6 +303,8 @@ func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time,
 			// 曜日毎の売上平均の取得
 			sales_average := sales_sum / int64(len(day_of_sales))
 			analysis_average_sales_per_day = append(analysis_average_sales_per_day, sales_average)
+		} else {
+			analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
 		}
 	}
 
@@ -317,6 +319,8 @@ func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time,
 			// 曜日毎の売上平均の取得
 			occupancy_rate_average := math.Round(occupancy_rate_sum / float64(len(day_of_occupancy_rate)))
 			analysis_average_occupancy_rate_per_day = append(analysis_average_occupancy_rate_per_day, occupancy_rate_average)
+		} else {
+			analysis_average_occupancy_rate_per_day = append(analysis_average_occupancy_rate_per_day, constants.ZERO)
 		}
 	}
 
@@ -331,6 +335,8 @@ func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time,
 			// 曜日毎の売上平均の取得
 			occupancy_rate_average := number_of_time_sum / int64(len(day_of_number_of_time))
 			analysis_average_number_of_time_per_day = append(analysis_average_number_of_time_per_day, occupancy_rate_average)
+		} else {
+			analysis_average_number_of_time_per_day = append(analysis_average_number_of_time_per_day, constants.ZERO)
 		}
 	}
 
