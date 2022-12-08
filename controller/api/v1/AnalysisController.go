@@ -100,12 +100,14 @@ func AnalysisPage(c *fiber.Ctx) error {
 	// 曜日別平均乗車回数
 	// 曜日別平均走行距離
 	// 乗車方式別平均売上
-	data, err := service.GetAllAnalysisData(c)
+	average_sales_per_day, average_occupancy_rate_per_day, average_number_of_time, err := service.GetAllAnalysisData(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
 	return c.JSON(fiber.Map{
-		"data": data,
+		"average_sales_per_day":          average_sales_per_day,
+		"average_occupancy_rate_per_day": average_occupancy_rate_per_day,
+		"average_number_of_time":         average_number_of_time,
 	})
 }
