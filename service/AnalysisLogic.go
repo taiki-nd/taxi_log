@@ -14,7 +14,6 @@ import (
 )
 
 func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, error) {
-	log.Println("DataSettingForSalesSum")
 
 	// params
 	//user_id, _ := strconv.Atoi(c.Query("user_id"))
