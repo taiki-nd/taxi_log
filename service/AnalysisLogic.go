@@ -198,10 +198,10 @@ func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
  * @params c *fiber.Ctx
  * @return
  */
-func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, interface{}, error) {
+func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
 	user, err := GetUserFromUuid(c)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	// params
@@ -216,9 +216,9 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, interface{}, er
 	period_finish := time.Date(finish_year, time.Month(finish_month), 1, 0, 0, 0, 0, time.Local)
 
 	// 曜日別平均の解析
-	average_sales_per_day, average_occupancy_rate_per_day, average_number_of_time, err := AnalysisAverageSalesPerDay(period_start, period_finish, user_id)
+	average_sales_per_day, average_occupancy_rate_per_day, err := AnalysisAverageSalesPerDay(period_start, period_finish, user_id)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	// 曜日別平均売上
@@ -227,17 +227,7 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, interface{}, er
 	// 曜日別平均走行距離
 	// 乗車方式別平均売上
 
-	return average_sales_per_day, average_occupancy_rate_per_day, average_number_of_time, nil
-}
-
-type SalesIndex struct {
-	Monday    []int64
-	Tuesday   []int64
-	Wednesday []int64
-	Thursday  []int64
-	Friday    []int64
-	Saturday  []int64
-	Sunday    []int64
+	return average_sales_per_day, average_occupancy_rate_per_day, nil
 }
 
 /**
@@ -248,7 +238,7 @@ type SalesIndex struct {
  * @params user_id uint
  * @returns
  */
-func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time, user_id uint) (interface{}, interface{}, interface{}, error) {
+func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time, user_id uint) (interface{}, interface{}, error) {
 	day_of_week := []string{"Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."}
 
 	// all_sales_index =[[月曜の売上一覧], [火曜の売上一覧]...]
@@ -257,15 +247,12 @@ func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time,
 	// all_occupancy_rate_index =[[月曜の実車率一覧], [火曜の実車率一覧]...]
 	var all_occupancy_rate_index [][]float64
 
-	// all_number_of_time_index =[[月曜の乗車回数一覧], [火曜の乗車回数一覧]...]
-	var all_number_of_time_index [][]int64
-
 	// 曜日別対象期間のレコードの売上取得
 	for _, day := range day_of_week {
 		var records_sales []int64
 		err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, day).Order("date asc").Pluck("daily_sales", &records_sales).Error
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, err
 		}
 		all_sales_index = append(all_sales_index, records_sales)
 	}
@@ -275,19 +262,9 @@ func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time,
 		var records_occupancy_rate []float64
 		err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, day).Order("date asc").Pluck("occupancy_rate", &records_occupancy_rate).Error
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, err
 		}
 		all_occupancy_rate_index = append(all_occupancy_rate_index, records_occupancy_rate)
-	}
-
-	// 曜日別対象期間のレコードの乗車回数取得
-	for _, day := range day_of_week {
-		var records_number_of_time []int64
-		err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, day).Order("date asc").Pluck("number_of_time", &records_number_of_time).Error
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		all_number_of_time_index = append(all_number_of_time_index, records_number_of_time)
 	}
 
 	// 曜日別平均値の取得
@@ -324,21 +301,5 @@ func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time,
 		}
 	}
 
-	// 乗車回数
-	var analysis_average_number_of_time_per_day []int64
-	for _, day_of_number_of_time := range all_number_of_time_index { // all_occupancy_rate_index =[[月曜の実車率一覧], [火曜の実車率一覧]...]
-		var number_of_time_sum int64 = 0
-		if len(day_of_number_of_time) != 0 { // day_of_number_of_time = [曜日毎の乗車回数一覧]
-			for _, sales := range day_of_number_of_time {
-				number_of_time_sum += sales
-			}
-			// 曜日毎の売上平均の取得
-			occupancy_rate_average := number_of_time_sum / int64(len(day_of_number_of_time))
-			analysis_average_number_of_time_per_day = append(analysis_average_number_of_time_per_day, occupancy_rate_average)
-		} else {
-			analysis_average_number_of_time_per_day = append(analysis_average_number_of_time_per_day, constants.ZERO)
-		}
-	}
-
-	return analysis_average_sales_per_day, analysis_average_occupancy_rate_per_day, analysis_average_number_of_time_per_day, nil
+	return analysis_average_sales_per_day, analysis_average_occupancy_rate_per_day, nil
 }
