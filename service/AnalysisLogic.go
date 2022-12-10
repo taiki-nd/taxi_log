@@ -160,6 +160,8 @@ func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
 	// params
 	year, _ := strconv.Atoi(c.Query("year"))
 	month, _ := strconv.Atoi(c.Query("month"))
+	var sales_period_start time.Time
+	var sales_period_finish time.Time
 
 	user, err := GetUserFromUuid(c)
 	if err != nil {
@@ -169,20 +171,82 @@ func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
 	// user_idの取得
 	user_id := user.Id
 
+	// 給与日の取得
+	pay_day := user.PayDay
+
 	// 締め日の取得
 	close_day := user.CloseDay
-	if user.CloseDay == 31 {
-		date := AdjustmentCloseDay(year, month)
-		close_day = date
-	}
-	sales_period_start := time.Date(year, time.Month(month), int(close_day), 12, 0, 0, 0, time.Local)
-	if month >= 12 {
-		year += 1
-		month = 1
+	var close_day_start int64
+	var close_day_finish int64
+
+	// 取得するデータの期間の確定
+	// 給与日が月をまたぐ場合
+	if pay_day-close_day < 0 {
+		// 開始期間の取得
+		if month == 1 {
+			year -= 1
+			month = 11
+		} else if month == 2 {
+			year -= 1
+			month = 12
+		} else {
+			month -= 2
+		}
+		if user.CloseDay == 31 {
+			date := AdjustmentCloseDay(year, month)
+			close_day_start = date
+		} else {
+			close_day_start = close_day
+		}
+		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 12, 0, 0, 0, time.Local)
+
+		// 終了期間の取得
+		if month == 12 {
+			year += 1
+			month = 1
+		} else {
+			month += 1
+		}
+		if user.CloseDay == 31 {
+			date := AdjustmentCloseDay(year, month)
+			close_day_finish = date
+		} else {
+			close_day_finish = close_day
+		}
+		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
+
+		// 給与日が月をまたがない場合
 	} else {
-		month += 1
+		// 開始期間の取得
+		if month == 1 {
+			year -= 1
+			month = 12
+		} else {
+			month -= 1
+		}
+		if user.CloseDay == 31 {
+			date := AdjustmentCloseDay(year, month)
+			close_day_start = date
+		} else {
+			close_day_start = close_day
+		}
+		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 12, 0, 0, 0, time.Local)
+
+		// 終了期間の取得
+		if month == 12 {
+			year += 1
+			month = 1
+		} else {
+			month += 1
+		}
+		if user.CloseDay == 31 {
+			date := AdjustmentCloseDay(year, month)
+			close_day_finish = date
+		} else {
+			close_day_finish = close_day
+		}
+		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
 	}
-	sales_period_finish := time.Date(year, time.Month(month), int(close_day), 12, 0, 0, 0, time.Local)
 
 	var records []*model.Record
 	err = db.DB.Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Find(&records).Error
