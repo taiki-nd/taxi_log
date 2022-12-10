@@ -1,6 +1,10 @@
 package service
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"log"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 /**
  * ErrorResponse
@@ -10,6 +14,7 @@ import "github.com/gofiber/fiber/v2"
  * @params message string
  */
 func ErrorResponse(c *fiber.Ctx, code []string, message string) error {
+	log.Printf("error: %v", message)
 	c.JSON(fiber.Map{
 		"info": fiber.Map{
 			"status":  false,
