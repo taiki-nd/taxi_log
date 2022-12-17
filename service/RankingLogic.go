@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/jinzhu/now"
 	"github.com/taiki-nd/taxi_log/db"
@@ -20,8 +18,7 @@ func GetRankingData(c *fiber.Ctx) (interface{}, error) {
 	weekly_start := today.AddDate(0, 0, -7)
 	monthly_start := today.AddDate(0, 0, -30)
 
-	fmt.Println(yesterday_start)
-
+	// 変数
 	var daily_ranking_every_other_day_records []*model.Record
 	var daily_ranking_day_records []*model.Record
 	var daily_ranking_night_records []*model.Record
