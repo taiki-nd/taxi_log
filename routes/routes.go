@@ -41,4 +41,7 @@ func Routes(app *fiber.App) {
 	app.Get("/api/v1/analysis/sales", controller.AnalysisSales)
 	app.Get("/api/v1/analysis/records", controller.GetRecords)
 	app.Get("/api/v1/analysis/analysis", controller.AnalysisPage)
+
+	// ranking
+	app.Get("/api/v1/ranking", controller.Ranking)
 }
