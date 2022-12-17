@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/now"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
+	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
 /**
@@ -32,49 +33,49 @@ func GetRankingData(c *fiber.Ctx) (interface{}, error) {
 	var monthly_ranking_night_records []*model.Record
 
 	// 昨日のランキング（隔日勤務）
-	err := db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", yesterday_start, today, "every_other_day").Order("daily_sales DESC").Find(&daily_ranking_every_other_day_records).Error
+	err := db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", yesterday_start, today, "every_other_day").Order("daily_sales DESC").Find(&daily_ranking_every_other_day_records).Error
 	if err != nil {
 		return nil, err
 	}
 	// 昨日のランキング（日勤）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", yesterday_start, today, "day").Order("daily_sales DESC").Find(&daily_ranking_day_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", yesterday_start, today, "day").Order("daily_sales DESC").Find(&daily_ranking_day_records).Error
 	if err != nil {
 		return nil, err
 	}
 	// 昨日のランキング（夜勤）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", yesterday_start, today, "night").Order("daily_sales DESC").Find(&daily_ranking_night_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", yesterday_start, today, "night").Order("daily_sales DESC").Find(&daily_ranking_night_records).Error
 	if err != nil {
 		return nil, err
 	}
 
 	// 7日間のランキング（隔日勤務）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", weekly_start, yesterday_start, "every_other_day").Order("daily_sales DESC").Find(&weekly_ranking_every_other_day_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", weekly_start, yesterday_start, "every_other_day").Order("daily_sales DESC").Find(&weekly_ranking_every_other_day_records).Error
 	if err != nil {
 		return nil, err
 	}
 	// 7日間のランキング（日勤）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", weekly_start, yesterday_start, "day").Order("daily_sales DESC").Find(&weekly_ranking_day_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", weekly_start, yesterday_start, "day").Order("daily_sales DESC").Find(&weekly_ranking_day_records).Error
 	if err != nil {
 		return nil, err
 	}
 	// 7日間のランキング（夜勤）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", weekly_start, yesterday_start, "night").Order("daily_sales DESC").Find(&weekly_ranking_night_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", weekly_start, yesterday_start, "night").Order("daily_sales DESC").Find(&weekly_ranking_night_records).Error
 	if err != nil {
 		return nil, err
 	}
 
 	// 31日間のランキング（隔日勤務）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", monthly_start, yesterday_start, "every_other_day").Order("daily_sales DESC").Find(&monthly_ranking_every_other_day_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", monthly_start, yesterday_start, "every_other_day").Order("daily_sales DESC").Find(&monthly_ranking_every_other_day_records).Error
 	if err != nil {
 		return nil, err
 	}
 	// 31日間のランキング（日勤）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", monthly_start, yesterday_start, "day").Order("daily_sales DESC").Find(&monthly_ranking_day_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", monthly_start, yesterday_start, "day").Order("daily_sales DESC").Find(&monthly_ranking_day_records).Error
 	if err != nil {
 		return nil, err
 	}
 	// 31日間のランキング（夜勤）
-	err = db.DB.Limit(10).Table("records").Where("date >= ? && date <= ? && style_flg = ?", monthly_start, yesterday_start, "night").Order("daily_sales DESC").Find(&monthly_ranking_night_records).Error
+	err = db.DB.Limit(constants.RANKING_LIMIT).Table("records").Where("date >= ? && date <= ? && style_flg = ?", monthly_start, yesterday_start, "night").Order("daily_sales DESC").Find(&monthly_ranking_night_records).Error
 	if err != nil {
 		return nil, err
 	}
