@@ -15,6 +15,9 @@ func Routes(app *fiber.App) {
 	app.Delete("/api/v1/users/:id", controller.UsersDelete)
 	app.Get("/api/v1/user/get_user_form_uid", controller.GetUserFromUuid)
 
+	// area
+	app.Get("/api/v1/areas", controller.GetAreas)
+
 	// follow
 	app.Post("/api/v1/follow", controller.Follow)
 	app.Get("/api/v1/followings", controller.Followings)
