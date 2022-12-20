@@ -16,7 +16,5 @@ func GetAreas(c *fiber.Ctx) error {
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
-	return c.JSON(fiber.Map{
-		"data": areas,
-	})
+	return service.SuccessResponse(c, []string{"get_areas_success"}, areas, nil)
 }
