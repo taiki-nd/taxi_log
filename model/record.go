@@ -7,6 +7,8 @@ type Record struct {
 	Date          time.Time `json:"date" gorm:"not null"`
 	DayOfWeek     string    `json:"day_of_week" gorm:"not null; size:10"`
 	StyleFlg      string    `json:"style_flg" gorm:"not null; size:256"`
+	Prefecture    string    `json:"prefecture" gorm:"not null; size:256"`
+	Area          string    `json:"area" gorm:"not null; size:256"`
 	StartHour     int64     `json:"start_hour" gorm:"not null"`
 	RunningTime   int64     `json:"running_time" gorm:"not null"`
 	RunningKm     int64     `json:"running_km" gorm:"not null"`
