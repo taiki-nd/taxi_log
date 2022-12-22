@@ -169,6 +169,7 @@ func UsersUpdate(c *fiber.Ctx) error {
 		"nickname":          user.Nickname,
 		"profile_image_url": user.ProfileImageUrl,
 		"prefecture":        user.Prefecture,
+		"area":              user.Area,
 		"company":           user.Company,
 		"style_flg":         user.StyleFlg,
 		"close_day":         user.CloseDay,
