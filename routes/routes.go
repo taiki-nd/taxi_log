@@ -40,9 +40,6 @@ func Routes(app *fiber.App) {
 	app.Delete("/api/v1/details/:id", controller.DetailsDelete)
 
 	// analysis
-	app.Get("/api/v1/analysis/sales_sum", controller.AnalysisSalesSum)
-	app.Get("/api/v1/analysis/sales", controller.AnalysisSales)
-	app.Get("/api/v1/analysis/records", controller.GetRecords)
 	app.Get("/api/v1/analysis/analysis", controller.AnalysisPage)
 	app.Get("/api/v1/analysis/home", controller.Analysis)
 
