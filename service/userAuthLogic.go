@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,7 +37,7 @@ func UserAuth(c *fiber.Ctx) ([]bool, []string, error) {
 		return statuses, errs, err
 	}
 	user_id = header.Id
-
+	fmt.Printf("user_id: %v\n", user_id)
 	// SigninCheck
 	if user_id == "" {
 		statuses = append(statuses, false)

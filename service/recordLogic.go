@@ -45,7 +45,7 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 		recordSearch.Where("daily_sales >= ?", daily_sales)
 	}
 	// admin権限の確認
-	user, err := GetUserFromUuid(c)
+	user, err := GetUserFromQuery(c)
 	if err != nil {
 		return nil, err
 	}

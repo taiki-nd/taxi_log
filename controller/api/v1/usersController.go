@@ -78,7 +78,7 @@ func UsersShow(c *fiber.Ctx) error {
 	*/
 
 	// レコードの取得
-	user, err := service.GetUser(c)
+	user, err := service.GetUserFromQuery(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
