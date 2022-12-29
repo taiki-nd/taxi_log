@@ -8,6 +8,7 @@ type User struct {
 	Nickname        string          `json:"nickname" gorm:"not null; size:30"`
 	ProfileImageUrl string          `json:"profile_image_url" gorm:"not null"`
 	Prefecture      string          `json:"prefecture" gorm:"not null; size:256"`
+	Area            string          `json:"area" gorm:"not null; size:256"`
 	Company         string          `json:"company" gorm:"not null; size:256"`
 	StyleFlg        string          `json:"style_flg" gorm:"not null; size:256"`
 	CloseDay        int64           `json:"close_day" gorm:"not null"`

@@ -36,6 +36,7 @@ func ConnectToDb() {
 		model.Detail{},
 		model.Record{},
 		model.UserFollowing{},
+		model.Area{},
 	)
 
 }

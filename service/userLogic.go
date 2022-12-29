@@ -165,6 +165,27 @@ func GetUser(c *fiber.Ctx) (*model.User, error) {
 }
 
 /**
+ * GetUserFromQuery
+ * user情報の取得
+ * @params c *fiber.Ctx
+ * @returns user *model.User
+ */
+func GetUserFromQuery(c *fiber.Ctx) (*model.User, error) {
+	// 変数確認
+	user_id := c.Query("id")
+	var user *model.User
+
+	// レコードの取得
+	err := db.DB.Where("id = ?", user_id).First(&user).Error
+	if err != nil {
+		log.Printf("db error: %v", err)
+		return nil, fmt.Errorf(constants.DB_ERR)
+	}
+
+	return user, nil
+}
+
+/**
  * GetUserFromUuid
  * uuidからuser情報を取得
  * @params c *fiber.Ctx

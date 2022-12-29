@@ -49,12 +49,12 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 	var sales_period_start time.Time
 	var sales_period_finish time.Time
 
-	user, err := GetUserFromUuid(c)
+	user, err := GetUserFromQuery(c)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// user_idの取得
+	// userの取得
 	user_id := user.Id
 
 	// 給与日の取得
@@ -163,7 +163,7 @@ func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
 	var sales_period_start time.Time
 	var sales_period_finish time.Time
 
-	user, err := GetUserFromUuid(c)
+	user, err := GetUserFromQuery(c)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +263,7 @@ func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
  * @return
  */
 func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
-	user, err := GetUserFromUuid(c)
+	user, err := GetUserFromQuery(c)
 	if err != nil {
 		return nil, nil, err
 	}
