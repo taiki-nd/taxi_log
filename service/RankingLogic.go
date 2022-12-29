@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/jinzhu/now"
 	"github.com/taiki-nd/taxi_log/db"
@@ -17,8 +15,6 @@ func GetRankingData(c *fiber.Ctx) (interface{}, error) {
 	// ランキング表示エリアの取得
 	prefecture := c.Query("prefecture")
 	area := c.Query("area")
-
-	fmt.Printf("prefecture: %v, area:%v\n", prefecture, area)
 
 	rankingDataQuery := db.DB.Where("")
 
