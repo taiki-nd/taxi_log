@@ -18,6 +18,7 @@ import (
  * @returns error error
  */
 func UsersIndex(c *fiber.Ctx) error {
+	log.Println("start UsersIndex")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -49,6 +50,7 @@ func UsersIndex(c *fiber.Ctx) error {
  * @returns error error
  */
 func UsersShow(c *fiber.Ctx) error {
+	log.Println("start UsersShow")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -93,6 +95,7 @@ func UsersShow(c *fiber.Ctx) error {
  * @returns error error
  */
 func UsersCreate(c *fiber.Ctx) error {
+	log.Println("start UsersCreate")
 	// 変数確認
 	var user *model.User
 
@@ -127,6 +130,7 @@ func UsersCreate(c *fiber.Ctx) error {
  * @params c *fiber.Ctx
  */
 func UsersUpdate(c *fiber.Ctx) error {
+	log.Println("start UsersUpdate")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -199,6 +203,7 @@ func UsersUpdate(c *fiber.Ctx) error {
  * @returns error
  */
 func UsersDelete(c *fiber.Ctx) error {
+	log.Println("start UsersDelete")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -246,6 +251,7 @@ func UsersDelete(c *fiber.Ctx) error {
  * @params c *fiber.Ctx
  */
 func GetUserFromUuid(c *fiber.Ctx) error {
+	log.Println("start GetUserFromUuid")
 	user, err := service.GetUserFromUuid(c)
 	if err != nil {
 		log.Printf("db error: %v", err)

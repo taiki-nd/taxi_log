@@ -20,6 +20,7 @@ import (
  * @returns error error
  */
 func RecordsIndex(c *fiber.Ctx) error {
+	log.Println("start RecordsIndex")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -63,6 +64,7 @@ func RecordsIndex(c *fiber.Ctx) error {
  * @returns error error
  */
 func RecordsShow(c *fiber.Ctx) error {
+	log.Println("start RecordsShow")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -111,6 +113,7 @@ func RecordsShow(c *fiber.Ctx) error {
  * @returns error error
  */
 func RecordsCreate(c *fiber.Ctx) error {
+	log.Println("start RecordsCreate")
 	// 変数確認
 	var record *model.Record
 
@@ -157,6 +160,7 @@ func RecordsCreate(c *fiber.Ctx) error {
  * @params c *fiber.Ctx
  */
 func RecordsUpdate(c *fiber.Ctx) error {
+	log.Println("start RecordsUpdate")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -227,6 +231,7 @@ func RecordsUpdate(c *fiber.Ctx) error {
  * @returns error
  */
 func RecordsDelete(c *fiber.Ctx) error {
+	log.Println("start RecordsDelete")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
