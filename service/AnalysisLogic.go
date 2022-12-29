@@ -43,7 +43,6 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, error) {
  * @return error
  */
 func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
-	fmt.Println("GetSalesIndex")
 	// params
 	year, _ := strconv.Atoi(c.Query("year"))
 	month, _ := strconv.Atoi(c.Query("month"))
@@ -57,8 +56,6 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 
 	// userの取得
 	user_id := user.Id
-
-	fmt.Printf("user_id: %v", user_id)
 
 	// 給与日の取得
 	pay_day := user.PayDay

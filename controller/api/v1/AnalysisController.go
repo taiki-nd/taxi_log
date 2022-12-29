@@ -13,7 +13,6 @@ import (
  * Analysis
  */
 func Analysis(c *fiber.Ctx) error {
-	fmt.Println("start analysis for home")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
