@@ -88,16 +88,18 @@ func RecordsShow(c *fiber.Ctx) error {
 	}
 
 	// admin権限の確認
-	if !statuses[1] {
-		// follower確認
-		status, err := service.IsFollowerForRecord(c, record)
-		if err != nil {
-			return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+	/*
+		if !statuses[1] {
+			// follower確認
+			status, err := service.IsFollowerForRecord(c, record)
+			if err != nil {
+				return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+			}
+			if !status {
+				return service.ErrorResponse(c, []string{constants.FOLLOW_RELATIONSHIP_ERROR}, "follow relationship error")
+			}
 		}
-		if !status {
-			return service.ErrorResponse(c, []string{constants.FOLLOW_RELATIONSHIP_ERROR}, "follow relationship error")
-		}
-	}
+	*/
 
 	return service.SuccessResponse(c, []string{"show_record_success"}, record, nil)
 }

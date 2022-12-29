@@ -15,6 +15,9 @@ func Routes(app *fiber.App) {
 	app.Delete("/api/v1/users/:id", controller.UsersDelete)
 	app.Get("/api/v1/user/get_user_form_uid", controller.GetUserFromUuid)
 
+	// area
+	app.Get("/api/v1/areas", controller.GetAreas)
+
 	// follow
 	app.Post("/api/v1/follow", controller.Follow)
 	app.Get("/api/v1/followings", controller.Followings)
@@ -37,10 +40,8 @@ func Routes(app *fiber.App) {
 	app.Delete("/api/v1/details/:id", controller.DetailsDelete)
 
 	// analysis
-	app.Get("/api/v1/analysis/sales_sum", controller.AnalysisSalesSum)
-	app.Get("/api/v1/analysis/sales", controller.AnalysisSales)
-	app.Get("/api/v1/analysis/records", controller.GetRecords)
 	app.Get("/api/v1/analysis/analysis", controller.AnalysisPage)
+	app.Get("/api/v1/analysis/home", controller.Analysis)
 
 	// ranking
 	app.Get("/api/v1/ranking", controller.Ranking)

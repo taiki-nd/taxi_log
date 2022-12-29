@@ -64,19 +64,21 @@ func UsersShow(c *fiber.Ctx) error {
 	}
 
 	// admin権限の確認
-	if !statuses[1] {
-		// follower確認
-		status, err := service.IsFollower(c)
-		if err != nil {
-			return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+	/*
+		if !statuses[1] {
+			// follower確認
+			status, err := service.IsFollower(c)
+			if err != nil {
+				return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+			}
+			if !status {
+				return service.ErrorResponse(c, []string{constants.FOLLOW_RELATIONSHIP_ERROR}, "follow relationship error")
+			}
 		}
-		if !status {
-			return service.ErrorResponse(c, []string{constants.FOLLOW_RELATIONSHIP_ERROR}, "follow relationship error")
-		}
-	}
+	*/
 
 	// レコードの取得
-	user, err := service.GetUser(c)
+	user, err := service.GetUserFromQuery(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
@@ -169,6 +171,7 @@ func UsersUpdate(c *fiber.Ctx) error {
 		"nickname":          user.Nickname,
 		"profile_image_url": user.ProfileImageUrl,
 		"prefecture":        user.Prefecture,
+		"area":              user.Area,
 		"company":           user.Company,
 		"style_flg":         user.StyleFlg,
 		"close_day":         user.CloseDay,
