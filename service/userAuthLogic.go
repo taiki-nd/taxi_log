@@ -2,14 +2,13 @@ package service
 
 import (
 	"log"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 )
 
 type AuthUser struct {
-	Id      uint
+	Id      string
 	Uuid    string
 	IsAdmin bool `json:"is_admin"`
 }
@@ -27,7 +26,7 @@ func UserAuth(c *fiber.Ctx) ([]bool, []string, error) {
 	var statuses []bool
 	var errs []string
 	var authUser *AuthUser
-	var user_id uint
+	var user_id string
 
 	// headerの確認
 	var header AuthUser
@@ -39,7 +38,7 @@ func UserAuth(c *fiber.Ctx) ([]bool, []string, error) {
 	user_id = header.Id
 
 	// SigninCheck
-	if user_id == 0 {
+	if user_id == "" {
 		statuses = append(statuses, false)
 		errs = append(errs, "user_not_signin")
 	} else {
@@ -65,13 +64,12 @@ func UserAuth(c *fiber.Ctx) ([]bool, []string, error) {
 
 	//UserMatchCheck
 	user_id_quey := c.Query("user_id")
-	user_id_int_query, _ := strconv.Atoi(user_id_quey)
 	if len(user_id_quey) == 0 {
 		statuses = append(statuses, false)
 		errs = append(errs, "user_not_match")
 	} else {
 		// 合致確認
-		if uint(user_id_int_query) == authUser.Id {
+		if user_id_quey == authUser.Id {
 			statuses = append(statuses, true)
 			errs = append(errs, "user_match")
 		} else {

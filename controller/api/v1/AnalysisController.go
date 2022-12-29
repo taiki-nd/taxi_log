@@ -10,6 +10,56 @@ import (
 )
 
 /**
+ * Analysis
+ */
+func Analysis(c *fiber.Ctx) error {
+	fmt.Println("start analysis for home")
+	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	// signin確認
+	if !statuses[0] {
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
+	}
+
+	// データ収集
+	// AnalysisSalesSum
+	sales_data_sum, dates_sum, err := service.DataSettingForSalesSum(c)
+	if err != nil {
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+	}
+
+	// AnalysisSales
+	sales_data, dates, err := service.GetSalesIndex(c)
+	if err != nil {
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+	}
+
+	// GetRecords
+	// データ収集
+	records, err := service.SearchRecordForMonth(c)
+	if err != nil {
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
+	}
+
+	data := map[string]interface{}{
+		"home_sales_sum": sales_data_sum,
+		"dates_sum":      dates_sum,
+		"home_sales":     sales_data,
+		"dates":          dates,
+		"records":        records,
+	}
+
+	return service.SuccessResponse(c, []string{"success_get_analysis_data"}, data, nil)
+}
+
+/**
  * AnalysisSalesSum
  */
 func AnalysisSalesSum(c *fiber.Ctx) error {
