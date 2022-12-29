@@ -4,7 +4,7 @@ import "time"
 
 type Record struct {
 	Id            uint      `json:"id" gorm:"primaryKey"`
-	Date          time.Time `json:"date" gorm:"not null"`
+	Date          time.Time `json:"date" gorm:"not null; index"`
 	DayOfWeek     string    `json:"day_of_week" gorm:"not null; size:10"`
 	StyleFlg      string    `json:"style_flg" gorm:"not null; size:256"`
 	Prefecture    string    `json:"prefecture" gorm:"not null; size:256"`
@@ -16,7 +16,7 @@ type Record struct {
 	NumberOfTime  int64     `json:"number_of_time" gorm:"not null"`
 	IsTax         bool      `json:"is_tax" gorm:"not null"`
 	DailySales    int64     `json:"daily_sales" gorm:"not null"`
-	UserId        uint      `json:"user_id"`
+	UserId        uint      `json:"user_id" gorm:"index"`
 	Details       []Detail  `json:"details" gorm:"foreignKey:RecordId"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
