@@ -18,6 +18,7 @@ import (
  * @returns error error
  */
 func DetailsIndex(c *fiber.Ctx) error {
+	log.Println("start DetailsIndex")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -49,6 +50,7 @@ func DetailsIndex(c *fiber.Ctx) error {
  * @returns error error
  */
 func DetailsShow(c *fiber.Ctx) error {
+	log.Println("start DetailsShow")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -83,6 +85,7 @@ func DetailsShow(c *fiber.Ctx) error {
  * @returns error error
  */
 func DetailsCreate(c *fiber.Ctx) error {
+	log.Println("start DetailsCreate")
 	// 変数確認
 	var detail *model.Detail
 
@@ -129,6 +132,7 @@ func DetailsCreate(c *fiber.Ctx) error {
  * @params c *fiber.Ctx
  */
 func DetailsUpdate(c *fiber.Ctx) error {
+	log.Println("start DetailsUpdate")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -195,6 +199,7 @@ func DetailsUpdate(c *fiber.Ctx) error {
  * @returns error
  */
 func DetailsDelete(c *fiber.Ctx) error {
+	log.Println("start DetailsDelete")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
