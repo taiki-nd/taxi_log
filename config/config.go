@@ -15,6 +15,7 @@ type ConfigList struct {
 	Name              string
 	User              string
 	Password          string
+	Url               string
 	GcsBucketName     string
 	GcsObjectPath     string
 	GcsKeyPath        string
@@ -39,6 +40,7 @@ func init() {
 		Name:              cfg.Section("db").Key("name").String(),
 		User:              cfg.Section("db").Key("user").String(),
 		Password:          cfg.Section("db").Key("password").String(),
+		Url:               cfg.Section("cors").Key("url").String(),
 		GcsBucketName:     cfg.Section("gcp").Key("gcs_bucket_name").String(),
 		GcsObjectPath:     cfg.Section("gcp").Key("gcs_object_path").String(),
 		GcsKeyPath:        cfg.Section("gcp").Key("gcs_key_path").String(),

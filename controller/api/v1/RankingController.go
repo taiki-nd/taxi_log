@@ -13,6 +13,7 @@ import (
  * Ranking
  */
 func Ranking(c *fiber.Ctx) error {
+	log.Println("start Ranking")
 	ranking_data, err := service.GetRankingData(c)
 	if err != nil {
 		log.Printf("db_err: %v", err)

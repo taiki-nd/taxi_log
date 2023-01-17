@@ -13,6 +13,7 @@ import (
  * Analysis
  */
 func Analysis(c *fiber.Ctx) error {
+	log.Println("start analysis (Home)")
 	// user認証
 	statuses, errs, err := service.UserAuth(c)
 	if err != nil {
@@ -62,6 +63,7 @@ func Analysis(c *fiber.Ctx) error {
  * AnalysisPage
  */
 func AnalysisPage(c *fiber.Ctx) error {
+	log.Println("start analysis (Analysis)")
 	// 曜日別平均の解析
 	// 曜日別平均売上
 	// 曜日別平均実車率
