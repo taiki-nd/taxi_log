@@ -16,6 +16,8 @@ type ConfigList struct {
 	User              string
 	Password          string
 	Url               string
+	StripePublicOkKey string
+	StripeSecretKey   string
 	GcsBucketName     string
 	GcsObjectPath     string
 	GcsKeyPath        string
@@ -41,6 +43,8 @@ func init() {
 		User:              cfg.Section("db").Key("user").String(),
 		Password:          cfg.Section("db").Key("password").String(),
 		Url:               cfg.Section("cors").Key("url").String(),
+		StripePublicOkKey: cfg.Section("stripe").Key("public_ok_key").String(),
+		StripeSecretKey:   cfg.Section("stripe").Key("secret_key").String(),
 		GcsBucketName:     cfg.Section("gcp").Key("gcs_bucket_name").String(),
 		GcsObjectPath:     cfg.Section("gcp").Key("gcs_object_path").String(),
 		GcsKeyPath:        cfg.Section("gcp").Key("gcs_key_path").String(),

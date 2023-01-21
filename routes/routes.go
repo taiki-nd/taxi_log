@@ -45,4 +45,7 @@ func Routes(app *fiber.App) {
 
 	// ranking
 	app.Get("/api/v1/ranking", controller.Ranking)
+
+	// stripe
+	app.Get("/api/v1/stripe/products", controller.GetProducts)
 }
