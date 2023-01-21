@@ -53,7 +53,7 @@ func GetProducts() ([]model.Product, error) {
 	return products, nil
 }
 
-func CreateCustomer(c model.Customer) (*string, error) {
+func CreateCustomer(c model.Customer) (interface{}, error) {
 
 	// stripe接続
 	stripe.Key = config.Config.StripeSecretKey
@@ -68,5 +68,5 @@ func CreateCustomer(c model.Customer) (*string, error) {
 		return nil, err
 	}
 
-	return &customerFromStripe.ID, nil
+	return &customerFromStripe, nil
 }

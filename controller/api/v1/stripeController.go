@@ -41,10 +41,10 @@ func CreateCustomer(c *fiber.Ctx) error {
 	}
 
 	// customer作成処理
-	customerId, err := service.CreateCustomer(*customer)
+	customerResponse, err := service.CreateCustomer(*customer)
 	if err != nil {
 		return service.ErrorResponse(c, []string{"create_customer_in_stripe_error"}, fmt.Sprintf("create customer error: %v", err))
 	}
 
-	return service.SuccessResponse(c, nil, customerId, nil)
+	return service.SuccessResponse(c, nil, customerResponse, nil)
 }
