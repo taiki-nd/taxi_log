@@ -48,4 +48,5 @@ func Routes(app *fiber.App) {
 
 	// stripe
 	app.Get("/api/v1/stripe/products", controller.GetProducts)
+	app.Post("/api/v1/stripe/customer", controller.CreateCustomer)
 }
