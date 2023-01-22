@@ -1,9 +1,11 @@
 package service
 
 import (
+	"github.com/gofiber/fiber/v2"
 	stripe "github.com/stripe/stripe-go/v74"
 	"github.com/stripe/stripe-go/v74/customer"
 	"github.com/stripe/stripe-go/v74/price"
+	"github.com/stripe/stripe-go/v74/setupintent"
 	"github.com/taiki-nd/taxi_log/config"
 	"github.com/taiki-nd/taxi_log/model"
 )
@@ -24,6 +26,25 @@ func CustomerValidation(customer *model.Customer) (bool, []string) {
 	// description
 	if len(customer.Description) == 0 {
 		errs = append(errs, "description_null_error")
+	}
+
+	// errの出力
+	if len(errs) != 0 {
+		return false, errs
+	}
+
+	return true, errs
+}
+
+/*
+ * PaymentValidation
+ */
+func PaymentValidation(payment *model.Payment) (bool, []string) {
+	var errs []string
+
+	// PaymentMethodTypes
+	if len(payment.PaymentMethodTypes) == 0 {
+		errs = append(errs, "paymentMethodType_null_error")
 	}
 
 	// errの出力
@@ -69,4 +90,25 @@ func CreateCustomer(c model.Customer) (interface{}, error) {
 	}
 
 	return &customerFromStripe, nil
+}
+
+func SetUpNewCard(c *fiber.Ctx, payment model.Payment) (interface{}, error) {
+	// stripe接続
+	stripe.Key = config.Config.StripeSecretKey
+
+	var customerId *string
+	c.ReqHeaderParser(&customerId)
+
+	params := &stripe.SetupIntentParams{
+		PaymentMethodTypes: []*string{
+			stripe.String("card"),
+		},
+		Customer: customerId,
+	}
+	pi, err := setupintent.New(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return pi, nil
 }

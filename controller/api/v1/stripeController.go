@@ -48,3 +48,23 @@ func CreateCustomer(c *fiber.Ctx) error {
 
 	return service.SuccessResponse(c, nil, customerResponse, nil)
 }
+
+/*
+ * SetupPayMethod
+ */
+func SetupPayMethod(c *fiber.Ctx) error {
+	var payment *model.Payment
+	// ボディーのパース
+	err := c.BodyParser(&payment)
+	if err != nil {
+		return service.ErrorResponse(c, []string{constants.BODY_PARSE_ERROR}, fmt.Sprintf("body parse error: %v", err))
+	}
+
+	// 支払い方法のセットアップ
+	pi, err := service.SetUpNewCard(c, *payment)
+	if err != nil {
+		return service.ErrorResponse(c, []string{"setup_payment_method_in_stripe_error"}, fmt.Sprintf("setup payment error: %v", err))
+	}
+
+	return service.SuccessResponse(c, nil, pi, nil)
+}

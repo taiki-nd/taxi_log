@@ -11,3 +11,7 @@ type Customer struct {
 	Email       string `json:"email"`
 	Description string `json:"description"`
 }
+
+type Payment struct {
+	PaymentMethodTypes []*string `json:"payment_method_types"`
+}
