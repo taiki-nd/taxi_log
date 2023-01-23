@@ -68,3 +68,12 @@ func SetupPayMethod(c *fiber.Ctx) error {
 
 	return service.SuccessResponse(c, nil, pi, nil)
 }
+
+/*
+ * CancelSubscription
+ */
+func CancelSubscription(c *fiber.Ctx) error {
+	s := service.CancelSubscription(c)
+
+	return service.SuccessResponse(c, nil, s, nil)
+}

@@ -1,11 +1,14 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	stripe "github.com/stripe/stripe-go/v74"
 	"github.com/stripe/stripe-go/v74/customer"
 	"github.com/stripe/stripe-go/v74/price"
 	"github.com/stripe/stripe-go/v74/setupintent"
+	"github.com/stripe/stripe-go/v74/subscription"
 	"github.com/taiki-nd/taxi_log/config"
 	"github.com/taiki-nd/taxi_log/model"
 )
@@ -111,4 +114,18 @@ func SetUpNewCard(c *fiber.Ctx, payment model.Payment) (interface{}, error) {
 	}
 
 	return pi, nil
+}
+
+func CancelSubscription(c *fiber.Ctx) interface{} {
+	sub_id := c.Query("subscription_id")
+
+	// stripe接続
+	stripe.Key = config.Config.StripeSecretKey
+
+	s, _ := subscription.Cancel(
+		sub_id,
+		nil,
+	)
+	fmt.Println(s)
+	return s
 }

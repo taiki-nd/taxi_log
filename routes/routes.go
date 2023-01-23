@@ -50,4 +50,5 @@ func Routes(app *fiber.App) {
 	app.Get("/api/v1/stripe/products", controller.GetProducts)
 	app.Post("/api/v1/stripe/customer", controller.CreateCustomer)
 	app.Post("/api/v1/stripe/setup_payment", controller.SetupPayMethod)
+	app.Post("/api/v1/stripe/cancel_subscription", controller.CancelSubscription)
 }
