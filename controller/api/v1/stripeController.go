@@ -73,7 +73,10 @@ func SetupPayMethod(c *fiber.Ctx) error {
  * CancelSubscription
  */
 func CancelSubscription(c *fiber.Ctx) error {
-	s := service.CancelSubscription(c)
+	sub, err := service.CancelSubscription(c)
+	if err != nil {
+		return service.ErrorResponse(c, []string{"cancel_subscription_error"}, fmt.Sprintf("cancel subscription error: %v", err))
+	}
 
-	return service.SuccessResponse(c, nil, s, nil)
+	return service.SuccessResponse(c, nil, sub, nil)
 }
