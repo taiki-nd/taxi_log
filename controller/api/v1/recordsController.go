@@ -260,12 +260,14 @@ func RecordsDelete(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	// record情報の削除
-	errRecord := db.DB.Delete(record).Error
-	if errRecord != nil {
+	// record情報の削除トランザクション開始
+	tx := db.DB.Begin()
+	err = service.RecordDeleteTransaction(tx, record)
+	if err != nil {
 		log.Printf("db error: %v", err)
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
+	tx.Commit()
 
 	return service.SuccessResponse(c, []string{"create_delete_success"}, nil, nil)
 }
