@@ -10,6 +10,19 @@ import (
 )
 
 func UsersDeleteTransaction(tx *gorm.DB, user *model.User) error {
+	var recordIds []uint
+	err := tx.Table("records").Where("user_id = ?", user.Id).Pluck("id", &recordIds).Error
+	if err != nil {
+		log.Printf("transaction delete record err: %v", err)
+		return fmt.Errorf("transaction_delete_record_err")
+	}
+
+	err = tx.Table("details").Where("record_id IN (?)", recordIds).Delete("").Error
+	if err != nil {
+		log.Printf("transaction delete record err: %v", err)
+		return fmt.Errorf("transaction_delete_record_err")
+	}
+
 	// detailの削除
 
 	// recordの削除
