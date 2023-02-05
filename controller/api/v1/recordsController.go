@@ -200,18 +200,19 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	}
 
 	update_record := map[string]interface{}{
-		"id":             record.Id,
-		"date":           record.Date,
-		"day_of_week":    record.DayOfWeek,
-		"style_flg":      record.StyleFlg,
-		"start_hour":     record.StartHour,
-		"running_time":   record.RunningTime,
-		"running_km":     record.RunningKm,
-		"occupancy_rate": record.OccupancyRate,
-		"number_of_time": record.NumberOfTime,
-		"is_tax":         record.IsTax,
-		"daily_sales":    record.DailySales,
-		"user_id":        record.UserId,
+		"id":                   record.Id,
+		"date":                 record.Date,
+		"day_of_week":          record.DayOfWeek,
+		"style_flg":            record.StyleFlg,
+		"start_hour":           record.StartHour,
+		"running_time":         record.RunningTime,
+		"running_km":           record.RunningKm,
+		"occupancy_rate":       record.OccupancyRate,
+		"number_of_time":       record.NumberOfTime,
+		"is_tax":               record.IsTax,
+		"daily_sales":          record.DailySales,
+		"daily_sales_with_tax": record.DailySalesWithTax,
+		"user_id":              record.UserId,
 	}
 
 	// record情報の更新
@@ -260,12 +261,14 @@ func RecordsDelete(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	// record情報の削除
-	errRecord := db.DB.Delete(record).Error
-	if errRecord != nil {
+	// record情報の削除トランザクション開始
+	tx := db.DB.Begin()
+	err = service.RecordDeleteTransaction(tx, record)
+	if err != nil {
 		log.Printf("db error: %v", err)
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
+	tx.Commit()
 
 	return service.SuccessResponse(c, []string{"create_delete_success"}, nil, nil)
 }
