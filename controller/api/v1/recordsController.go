@@ -209,7 +209,6 @@ func RecordsUpdate(c *fiber.Ctx) error {
 		"running_km":           record.RunningKm,
 		"occupancy_rate":       record.OccupancyRate,
 		"number_of_time":       record.NumberOfTime,
-		"is_tax":               record.IsTax,
 		"daily_sales":          record.DailySales,
 		"daily_sales_with_tax": record.DailySalesWithTax,
 		"user_id":              record.UserId,

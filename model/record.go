@@ -14,7 +14,6 @@ type Record struct {
 	RunningKm         int64     `json:"running_km" gorm:"not null"`
 	OccupancyRate     float64   `json:"occupancy_rate" gorm:"not null"`
 	NumberOfTime      int64     `json:"number_of_time" gorm:"not null"`
-	IsTax             bool      `json:"is_tax" gorm:"not null"`
 	DailySales        int64     `json:"daily_sales" gorm:"not null"`
 	DailySalesWithTax int64     `json:"daily_sales_with_tax" gorm:"not null"`
 	UserId            uint      `json:"user_id" gorm:"index"`
