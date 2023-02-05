@@ -200,18 +200,19 @@ func RecordsUpdate(c *fiber.Ctx) error {
 	}
 
 	update_record := map[string]interface{}{
-		"id":             record.Id,
-		"date":           record.Date,
-		"day_of_week":    record.DayOfWeek,
-		"style_flg":      record.StyleFlg,
-		"start_hour":     record.StartHour,
-		"running_time":   record.RunningTime,
-		"running_km":     record.RunningKm,
-		"occupancy_rate": record.OccupancyRate,
-		"number_of_time": record.NumberOfTime,
-		"is_tax":         record.IsTax,
-		"daily_sales":    record.DailySales,
-		"user_id":        record.UserId,
+		"id":                   record.Id,
+		"date":                 record.Date,
+		"day_of_week":          record.DayOfWeek,
+		"style_flg":            record.StyleFlg,
+		"start_hour":           record.StartHour,
+		"running_time":         record.RunningTime,
+		"running_km":           record.RunningKm,
+		"occupancy_rate":       record.OccupancyRate,
+		"number_of_time":       record.NumberOfTime,
+		"is_tax":               record.IsTax,
+		"daily_sales":          record.DailySales,
+		"daily_sales_with_tax": record.DailySalesWithTax,
+		"user_id":              record.UserId,
 	}
 
 	// record情報の更新
