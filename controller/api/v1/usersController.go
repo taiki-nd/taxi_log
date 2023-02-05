@@ -181,7 +181,6 @@ func UsersUpdate(c *fiber.Ctx) error {
 		"close_day":         user.CloseDay,
 		"daily_target":      user.DailyTarget,
 		"monthly_target":    user.MonthlyTarget,
-		"is_tax":            user.IsTax,
 		"open_flg":          user.OpenFlg,
 		"is_admin":          user.IsAdmin,
 	}

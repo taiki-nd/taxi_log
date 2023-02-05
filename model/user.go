@@ -15,7 +15,6 @@ type User struct {
 	PayDay          int64           `json:"pay_day" gorm:"not null"`
 	DailyTarget     int64           `json:"daily_target" gorm:"not null"`
 	MonthlyTarget   int64           `json:"monthly_target" gorm:"not null"`
-	IsTax           bool            `json:"is_tax" gorm:"not null; default:false"`
 	OpenFlg         string          `json:"open_flg" gorm:"not null; size:256; default:open"`
 	IsAdmin         bool            `json:"is_admin" gorm:"not null; default:false"`
 	Records         []Record        `json:"records" gorm:"foreignKey:UserId"`
