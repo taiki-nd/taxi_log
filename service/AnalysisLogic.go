@@ -277,7 +277,7 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
 
 	// 期間の設定
 	period_start := time.Date(start_year, time.Month(start_month), 1, 0, 0, 0, 0, time.Local)
-	period_finish := time.Date(finish_year, time.Month(finish_month), 1, 0, 0, 0, 0, time.Local)
+	period_finish := time.Date(finish_year, time.Month(finish_month+1), 1, 0, 0, 0, 0, time.Local)
 
 	// 曜日別平均の解析
 	average_sales_per_day, average_occupancy_rate_per_day, err := AnalysisAverageSalesPerDay(period_start, period_finish, user_id)
