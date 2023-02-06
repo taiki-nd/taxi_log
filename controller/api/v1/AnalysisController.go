@@ -10,7 +10,7 @@ import (
 )
 
 /**
- * Analysis
+ * Analysis(Home)
  */
 func Analysis(c *fiber.Ctx) error {
 	log.Println("start analysis (Home)")

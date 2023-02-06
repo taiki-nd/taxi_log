@@ -285,11 +285,7 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
 		return nil, nil, err
 	}
 
-	// 曜日別平均売上
-	// 曜日別平均実車率
-	// 曜日別平均乗車回数
-	// 曜日別平均走行距離
-	// 乗車方式別平均売上
+	// 対象期間データの取得
 
 	return average_sales_per_day, average_occupancy_rate_per_day, nil
 }
