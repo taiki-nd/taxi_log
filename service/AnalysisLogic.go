@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 	"log"
-	"math"
 	"strconv"
 	"time"
 
@@ -268,6 +267,8 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
 		return nil, nil, err
 	}
 
+	var records []model.Record
+
 	// params
 	start_year, _ := strconv.Atoi(c.Query("start_year"))
 	start_month, _ := strconv.Atoi(c.Query("start_month"))
@@ -279,87 +280,107 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
 	period_start := time.Date(start_year, time.Month(start_month), 1, 0, 0, 0, 0, time.Local)
 	period_finish := time.Date(finish_year, time.Month(finish_month+1), 1, 0, 0, 0, 0, time.Local)
 
-	// 曜日別平均の解析
-	average_sales_per_day, average_occupancy_rate_per_day, err := AnalysisAverageSalesPerDay(period_start, period_finish, user_id)
+	//
+	// 対象期間データの取得
+	//
+	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, period_start, period_finish).Find(&records).Error
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// 対象期間データの取得
+	fmt.Println(records)
+
+	// 曜日別売上解析データ
+	average_sales_per_day := AnalysisAverageSalesPerDay(records)
+
+	// 曜日別実車率データ
+	average_occupancy_rate_per_day := AnalysisAverageOccupancyRatePerDay(records)
 
 	return average_sales_per_day, average_occupancy_rate_per_day, nil
 }
 
 /**
  * AnalysisAverageSalesPerDay
- * 曜日別平均売上の取得
- * @params period_start time.Time
- * @params period_finish time.Time
- * @params user_id uint
- * @returns
+ * @params records []model.Record
+ * @return [][]int64
  */
-func AnalysisAverageSalesPerDay(period_start time.Time, period_finish time.Time, user_id uint) (interface{}, interface{}, error) {
-	day_of_week := []string{"Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."}
-
+func AnalysisAverageSalesPerDay(records []model.Record) [][]int64 {
 	// all_sales_index =[[月曜の売上一覧], [火曜の売上一覧]...]
 	var all_sales_index [][]int64
+	var mon_sales_index []int64
+	var tue_sales_index []int64
+	var wed_sales_index []int64
+	var thu_sales_index []int64
+	var fri_sales_index []int64
+	var sat_sales_index []int64
+	var sun_sales_index []int64
 
+	// 曜日別に振り分け
+	for _, record := range records {
+		switch record.DayOfWeek {
+		case "Mon.":
+			mon_sales_index = append(mon_sales_index, record.DailySales)
+		case "Tue.":
+			tue_sales_index = append(tue_sales_index, record.DailySales)
+		case "Wed.":
+			wed_sales_index = append(wed_sales_index, record.DailySales)
+		case "Thu.":
+			thu_sales_index = append(thu_sales_index, record.DailySales)
+		case "Fri.":
+			fri_sales_index = append(fri_sales_index, record.DailySales)
+		case "Sat.":
+			sat_sales_index = append(sat_sales_index, record.DailySales)
+		case "Sun.":
+			sun_sales_index = append(sun_sales_index, record.DailySales)
+		}
+	}
+
+	all_sales_index = append(all_sales_index, mon_sales_index, tue_sales_index, wed_sales_index, thu_sales_index, fri_sales_index, sat_sales_index, sun_sales_index)
+
+	return all_sales_index
+}
+
+/**
+ * AnalysisAverageOccupancyRatePerDay
+ * @params records []model.Record
+ * @return [][]float64
+ */
+func AnalysisAverageOccupancyRatePerDay(records []model.Record) [][]float64 {
 	// all_occupancy_rate_index =[[月曜の実車率一覧], [火曜の実車率一覧]...]
 	var all_occupancy_rate_index [][]float64
+	var mon_occupancy_rate_index []float64
+	var tue_occupancy_rate_index []float64
+	var wed_occupancy_rate_index []float64
+	var thu_occupancy_rate_index []float64
+	var fri_occupancy_rate_index []float64
+	var sat_occupancy_rate_index []float64
+	var sun_occupancy_rate_index []float64
 
-	// 曜日別対象期間のレコードの売上取得
-	for _, day := range day_of_week {
-		var records_sales []int64
-		err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, day).Order("date asc").Pluck("daily_sales", &records_sales).Error
-		if err != nil {
-			return nil, nil, err
-		}
-		all_sales_index = append(all_sales_index, records_sales)
-	}
-
-	// 曜日別対象期間のレコードの実車率取得
-	for _, day := range day_of_week {
-		var records_occupancy_rate []float64
-		err := db.DB.Table("records").Where("user_id = ? && date > ? && date <= ? && day_of_week = ?", user_id, period_start, period_finish, day).Order("date asc").Pluck("occupancy_rate", &records_occupancy_rate).Error
-		if err != nil {
-			return nil, nil, err
-		}
-		all_occupancy_rate_index = append(all_occupancy_rate_index, records_occupancy_rate)
-	}
-
-	// 曜日別平均値の取得
-
-	// 売上
-	var analysis_average_sales_per_day []int64
-	for _, day_of_sales := range all_sales_index { // all_sales_index =[[月曜の売上一覧], [火曜の売上一覧]...]
-		var sales_sum int64 = 0
-		if len(day_of_sales) != 0 { // day_of_sales = [曜日毎の売上一覧]
-			for _, sales := range day_of_sales {
-				sales_sum += sales
-			}
-			// 曜日毎の売上平均の取得
-			sales_average := sales_sum / int64(len(day_of_sales))
-			analysis_average_sales_per_day = append(analysis_average_sales_per_day, sales_average)
-		} else {
-			analysis_average_sales_per_day = append(analysis_average_sales_per_day, constants.ZERO)
+	// 曜日別に振り分け
+	for _, record := range records {
+		switch record.DayOfWeek {
+		case "Mon.":
+			mon_occupancy_rate_index = append(mon_occupancy_rate_index, record.OccupancyRate)
+		case "Tue.":
+			tue_occupancy_rate_index = append(tue_occupancy_rate_index, record.OccupancyRate)
+		case "Wed.":
+			wed_occupancy_rate_index = append(wed_occupancy_rate_index, record.OccupancyRate)
+		case "Thu.":
+			thu_occupancy_rate_index = append(thu_occupancy_rate_index, record.OccupancyRate)
+		case "Fri.":
+			fri_occupancy_rate_index = append(fri_occupancy_rate_index, record.OccupancyRate)
+		case "Sat.":
+			sat_occupancy_rate_index = append(sat_occupancy_rate_index, record.OccupancyRate)
+		case "Sun.":
+			sun_occupancy_rate_index = append(sun_occupancy_rate_index, record.OccupancyRate)
 		}
 	}
 
-	// 実車率
-	var analysis_average_occupancy_rate_per_day []float64
-	for _, day_of_occupancy_rate := range all_occupancy_rate_index { // all_occupancy_rate_index =[[月曜の実車率一覧], [火曜の実車率一覧]...]
-		var occupancy_rate_sum float64 = 0
-		if len(day_of_occupancy_rate) != 0 { // day_of_occupancy_rate = [曜日毎の実車率一覧]
-			for _, sales := range day_of_occupancy_rate {
-				occupancy_rate_sum += sales
-			}
-			// 曜日毎の売上平均の取得
-			occupancy_rate_average := math.Round(occupancy_rate_sum / float64(len(day_of_occupancy_rate)))
-			analysis_average_occupancy_rate_per_day = append(analysis_average_occupancy_rate_per_day, occupancy_rate_average)
-		} else {
-			analysis_average_occupancy_rate_per_day = append(analysis_average_occupancy_rate_per_day, constants.ZERO)
-		}
-	}
+	all_occupancy_rate_index = append(all_occupancy_rate_index, mon_occupancy_rate_index, tue_occupancy_rate_index, wed_occupancy_rate_index, thu_occupancy_rate_index, fri_occupancy_rate_index, sat_occupancy_rate_index, sun_occupancy_rate_index)
 
-	return analysis_average_sales_per_day, analysis_average_occupancy_rate_per_day, nil
+	return all_occupancy_rate_index
 }
+
+/**
+ * PeriodAnalysisData
+ */
