@@ -488,6 +488,7 @@ func AnalysisAverageOccupancyRatePerDay(records []model.Record) []float64 {
  */
 func PeriodAnalysisData(records []model.Record) interface{} {
 	var dailyAverageSales int64
+	var dailyAverageOccupancyRate float64
 	var periodTimeUnitSales int64     // 時間単価
 	var periodCustomerUnitSales int64 // 客単価
 	var periodDistanceUnitSales int64 // 距離単価
@@ -523,17 +524,19 @@ func PeriodAnalysisData(records []model.Record) interface{} {
 
 	// 平均化
 	dailyAverageSales = sales_sum / int64(records_number)
+	dailyAverageOccupancyRate = occupancy_rate_sum / float64(records_number)
 	periodTimeUnitSales = sales_sum / running_time_sum
 	periodCustomerUnitSales = sales_sum / number_of_time
 	periodDistanceUnitSales = sales_sum / running_km_sum
 
 	data := map[string]interface{}{
-		"dailyAverageSales":       dailyAverageSales,
-		"periodTimeUnitSales":     periodTimeUnitSales,
-		"periodCustomerUnitSales": periodCustomerUnitSales,
-		"periodDistanceUnitSales": periodDistanceUnitSales,
-		"maxSales":                maxSales,
-		"maxOccupancyRate":        math.Round(maxOccupancyRate * 10 / 10),
+		"dailyAverageSales":         dailyAverageSales,
+		"dailyAverageOccupancyRate": dailyAverageOccupancyRate,
+		"periodTimeUnitSales":       periodTimeUnitSales,
+		"periodCustomerUnitSales":   periodCustomerUnitSales,
+		"periodDistanceUnitSales":   periodDistanceUnitSales,
+		"maxSales":                  maxSales,
+		"maxOccupancyRate":          math.Round(maxOccupancyRate * 10 / 10),
 	}
 
 	return data
