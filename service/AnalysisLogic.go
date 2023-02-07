@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 	"time"
 
@@ -261,10 +262,10 @@ func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
  * @params c *fiber.Ctx
  * @return
  */
-func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
+func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, interface{}, error) {
 	user, err := GetUserFromQuery(c)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	var records []model.Record
@@ -285,7 +286,7 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
 	//
 	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, period_start, period_finish).Find(&records).Error
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	fmt.Println(records)
@@ -296,7 +297,10 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
 	// 曜日別実車率データ
 	average_occupancy_rate_per_day := AnalysisAverageOccupancyRatePerDay(records)
 
-	return average_sales_per_day, average_occupancy_rate_per_day, nil
+	// 期間内解析データの取得
+	period_data := PeriodAnalysisData(records)
+
+	return average_sales_per_day, average_occupancy_rate_per_day, period_data, nil
 }
 
 /**
@@ -304,9 +308,7 @@ func GetAllAnalysisData(c *fiber.Ctx) (interface{}, interface{}, error) {
  * @params records []model.Record
  * @return [][]int64
  */
-func AnalysisAverageSalesPerDay(records []model.Record) [][]int64 {
-	// all_sales_index =[[月曜の売上一覧], [火曜の売上一覧]...]
-	var all_sales_index [][]int64
+func AnalysisAverageSalesPerDay(records []model.Record) []int64 {
 	var mon_sales_index []int64
 	var tue_sales_index []int64
 	var wed_sales_index []int64
@@ -314,6 +316,22 @@ func AnalysisAverageSalesPerDay(records []model.Record) [][]int64 {
 	var fri_sales_index []int64
 	var sat_sales_index []int64
 	var sun_sales_index []int64
+
+	var mon_sum int64
+	var tue_sum int64
+	var wed_sum int64
+	var thu_sum int64
+	var fri_sum int64
+	var sat_sum int64
+	var sun_sum int64
+
+	var mon_ave int64
+	var tue_ave int64
+	var wed_ave int64
+	var thu_ave int64
+	var fri_ave int64
+	var sat_ave int64
+	var sun_ave int64
 
 	// 曜日別に振り分け
 	for _, record := range records {
@@ -335,9 +353,43 @@ func AnalysisAverageSalesPerDay(records []model.Record) [][]int64 {
 		}
 	}
 
-	all_sales_index = append(all_sales_index, mon_sales_index, tue_sales_index, wed_sales_index, thu_sales_index, fri_sales_index, sat_sales_index, sun_sales_index)
+	// 曜日別平均値の算出
+	for _, sale_index := range mon_sales_index {
+		mon_sum += sale_index
+	}
+	mon_ave = mon_sum / int64(len(mon_sales_index))
 
-	return all_sales_index
+	for _, sale_index := range tue_sales_index {
+		tue_sum += sale_index
+	}
+	tue_ave = mon_sum / int64(len(tue_sales_index))
+
+	for _, sale_index := range wed_sales_index {
+		wed_sum += sale_index
+	}
+	wed_ave = wed_sum / int64(len(wed_sales_index))
+
+	for _, sale_index := range thu_sales_index {
+		thu_sum += sale_index
+	}
+	thu_ave = thu_sum / int64(len(thu_sales_index))
+
+	for _, sale_index := range fri_sales_index {
+		fri_sum += sale_index
+	}
+	fri_ave = fri_sum / int64(len(fri_sales_index))
+
+	for _, sale_index := range sat_sales_index {
+		sat_sum += sale_index
+	}
+	sat_ave = sat_sum / int64(len(sat_sales_index))
+
+	for _, sale_index := range sun_sales_index {
+		sun_sum += sale_index
+	}
+	sun_ave = sun_sum / int64(len(sun_sales_index))
+
+	return []int64{mon_ave, tue_ave, wed_ave, thu_ave, fri_ave, sat_ave, sun_ave}
 }
 
 /**
@@ -345,9 +397,7 @@ func AnalysisAverageSalesPerDay(records []model.Record) [][]int64 {
  * @params records []model.Record
  * @return [][]float64
  */
-func AnalysisAverageOccupancyRatePerDay(records []model.Record) [][]float64 {
-	// all_occupancy_rate_index =[[月曜の実車率一覧], [火曜の実車率一覧]...]
-	var all_occupancy_rate_index [][]float64
+func AnalysisAverageOccupancyRatePerDay(records []model.Record) []float64 {
 	var mon_occupancy_rate_index []float64
 	var tue_occupancy_rate_index []float64
 	var wed_occupancy_rate_index []float64
@@ -355,6 +405,22 @@ func AnalysisAverageOccupancyRatePerDay(records []model.Record) [][]float64 {
 	var fri_occupancy_rate_index []float64
 	var sat_occupancy_rate_index []float64
 	var sun_occupancy_rate_index []float64
+
+	var mon_sum float64
+	var tue_sum float64
+	var wed_sum float64
+	var thu_sum float64
+	var fri_sum float64
+	var sat_sum float64
+	var sun_sum float64
+
+	var mon_ave float64
+	var tue_ave float64
+	var wed_ave float64
+	var thu_ave float64
+	var fri_ave float64
+	var sat_ave float64
+	var sun_ave float64
 
 	// 曜日別に振り分け
 	for _, record := range records {
@@ -376,11 +442,99 @@ func AnalysisAverageOccupancyRatePerDay(records []model.Record) [][]float64 {
 		}
 	}
 
-	all_occupancy_rate_index = append(all_occupancy_rate_index, mon_occupancy_rate_index, tue_occupancy_rate_index, wed_occupancy_rate_index, thu_occupancy_rate_index, fri_occupancy_rate_index, sat_occupancy_rate_index, sun_occupancy_rate_index)
+	// 曜日別平均値の算出
+	for _, occupancy_rate_index := range mon_occupancy_rate_index {
+		mon_sum += occupancy_rate_index
+	}
+	mon_ave = mon_sum / float64(len(mon_occupancy_rate_index))
 
-	return all_occupancy_rate_index
+	for _, occupancy_rate_index := range tue_occupancy_rate_index {
+		tue_sum += occupancy_rate_index
+	}
+	tue_ave = mon_sum / float64(len(tue_occupancy_rate_index))
+
+	for _, occupancy_rate_index := range wed_occupancy_rate_index {
+		wed_sum += occupancy_rate_index
+	}
+	wed_ave = wed_sum / float64(len(wed_occupancy_rate_index))
+
+	for _, occupancy_rate_index := range thu_occupancy_rate_index {
+		thu_sum += occupancy_rate_index
+	}
+	thu_ave = thu_sum / float64(len(thu_occupancy_rate_index))
+
+	for _, occupancy_rate_index := range fri_occupancy_rate_index {
+		fri_sum += occupancy_rate_index
+	}
+	fri_ave = fri_sum / float64(len(fri_occupancy_rate_index))
+
+	for _, occupancy_rate_index := range sat_occupancy_rate_index {
+		sat_sum += occupancy_rate_index
+	}
+	sat_ave = sat_sum / float64(len(sat_occupancy_rate_index))
+
+	for _, occupancy_rate_index := range sun_occupancy_rate_index {
+		sun_sum += occupancy_rate_index
+	}
+	sun_ave = sun_sum / float64(len(sun_occupancy_rate_index))
+
+	return []float64{mon_ave, tue_ave, wed_ave, thu_ave, fri_ave, sat_ave, sun_ave}
 }
 
 /**
  * PeriodAnalysisData
+ * records []model.Record
+ * [][]float64
  */
+func PeriodAnalysisData(records []model.Record) interface{} {
+	var dailyAverageSales int64
+	var periodTimeUnitSales int64     // 時間単価
+	var periodCustomerUnitSales int64 // 客単価
+	var periodDistanceUnitSales int64 // 距離単価
+	var maxSales int64                // 最高売上
+	var maxOccupancyRate float64      // 最高実車率
+
+	var sales_sum int64
+	var occupancy_rate_sum float64
+	var running_time_sum int64
+	var running_km_sum int64
+	var number_of_time int64
+
+	records_number := len(records)
+
+	// 各項目合計値の取得
+	for _, record := range records {
+		sales_sum += record.DailySales
+		occupancy_rate_sum += record.OccupancyRate
+		running_time_sum += record.RunningTime
+		running_km_sum += record.RunningKm
+		number_of_time += record.NumberOfTime
+
+		sales := record.DailySales
+		if maxSales <= sales {
+			maxSales = sales
+		}
+
+		occupancyRate := record.OccupancyRate
+		if maxOccupancyRate <= occupancyRate {
+			maxOccupancyRate = occupancyRate
+		}
+	}
+
+	// 平均化
+	dailyAverageSales = sales_sum / int64(records_number)
+	periodTimeUnitSales = sales_sum / running_time_sum
+	periodCustomerUnitSales = sales_sum / number_of_time
+	periodDistanceUnitSales = sales_sum / running_km_sum
+
+	data := map[string]interface{}{
+		"dailyAverageSales":       dailyAverageSales,
+		"periodTimeUnitSales":     periodTimeUnitSales,
+		"periodCustomerUnitSales": periodCustomerUnitSales,
+		"periodDistanceUnitSales": periodDistanceUnitSales,
+		"maxSales":                maxSales,
+		"maxOccupancyRate":        math.Round(maxOccupancyRate * 10 / 10),
+	}
+
+	return data
+}
