@@ -524,7 +524,8 @@ func PeriodAnalysisData(records []model.Record) interface{} {
 
 	// 平均化
 	dailyAverageSales = sales_sum / int64(records_number)
-	dailyAverageOccupancyRate = occupancy_rate_sum / float64(records_number)
+	shift := math.Pow(10, 1)
+	dailyAverageOccupancyRate = roundInt(occupancy_rate_sum/float64(records_number)*shift) / shift
 	periodTimeUnitSales = sales_sum / running_time_sum
 	periodCustomerUnitSales = sales_sum / number_of_time
 	periodDistanceUnitSales = sales_sum / running_km_sum
@@ -540,4 +541,13 @@ func PeriodAnalysisData(records []model.Record) interface{} {
 	}
 
 	return data
+}
+
+// 四捨五入用関数
+func roundInt(num float64) float64 {
+	t := math.Trunc(num)
+	if math.Abs(num-t) >= 0.5 {
+		return t + math.Copysign(1, num)
+	}
+	return t
 }
