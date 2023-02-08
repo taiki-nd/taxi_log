@@ -28,31 +28,19 @@ func Analysis(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
 	}
 
-	// データ収集
-	// AnalysisSalesSum
-	sales_data_sum, dates_sum, period, err := service.DataSettingForSalesSum(c)
+	// records
+	records, period, err := service.GetSalesIndex(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	// AnalysisSales
-	sales_data, dates, _, err := service.GetSalesIndex(c)
-	if err != nil {
-		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
-	}
-
-	// GetRecords
-	// データ収集
-	records, err := service.SearchRecordForMonth(c)
-	if err != nil {
-		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
-	}
+	// sales_data
+	sales_data_sum, sales_data, dates := service.SalesData(records)
 
 	fmt.Println(period)
 
 	data := map[string]interface{}{
 		"home_sales_sum": sales_data_sum,
-		"dates_sum":      dates_sum,
 		"home_sales":     sales_data,
 		"dates":          dates,
 		"period":         period,

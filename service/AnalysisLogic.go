@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"time"
@@ -10,30 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/taiki-nd/taxi_log/db"
 	"github.com/taiki-nd/taxi_log/model"
-	"github.com/taiki-nd/taxi_log/utils/constants"
 )
-
-func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, map[string]time.Time, error) {
-
-	// params
-	//user_id, _ := strconv.Atoi(c.Query("user_id"))
-
-	// 日報売上一覧の取得
-	sales, dates, period, err := GetSalesIndex(c)
-	if err != nil {
-		log.Printf("db error: %v", err)
-		return nil, nil, nil, fmt.Errorf(constants.DB_ERR)
-	}
-
-	var sales_sums []int64
-	var i int64 = 0
-	for _, daily_sales := range sales {
-		i += daily_sales
-		sales_sums = append(sales_sums, i)
-	}
-
-	return sales_sums, dates, period, nil
-}
 
 /**
  * GetSalesIndex
@@ -42,7 +18,7 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, map[string]time
  * @return []int64
  * @return error
  */
-func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, map[string]time.Time, error) {
+func GetSalesIndex(c *fiber.Ctx) ([]*model.Record, map[string]time.Time, error) {
 	// params
 	year, _ := strconv.Atoi(c.Query("year"))
 	month, _ := strconv.Atoi(c.Query("month"))
@@ -51,7 +27,7 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, map[string]time.Time, er
 
 	user, err := GetUserFromQuery(c)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	// userの取得
@@ -116,7 +92,7 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, map[string]time.Time, er
 		} else {
 			close_day_start = close_day
 		}
-		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 12, 0, 0, 0, time.Local)
+		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 0, 0, 0, 0, time.Local)
 
 		// 終了期間の取得
 		if month == 12 {
@@ -131,138 +107,52 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, map[string]time.Time, er
 		} else {
 			close_day_finish = close_day
 		}
-		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
+		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 0, 0, 0, 0, time.Local)
 	}
 
 	fmt.Printf("sales_period_start %v \n", sales_period_start)
 	fmt.Printf("sales_period_finish %v \n", sales_period_finish)
 
-	var sales []int64
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Pluck("daily_sales", &sales).Error
-	if err != nil {
-		return nil, nil, nil, err
-	}
+	start_period := sales_period_start.AddDate(0, 0, 2)
+	finish_period := sales_period_finish.AddDate(0, 0, 1)
 
-	var dates []time.Time
-	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Pluck("date", &dates).Error
+	fmt.Printf("start_period %v \n", start_period)
+	fmt.Printf("finish_period %v \n", finish_period)
+
+	var records []*model.Record
+	err = db.DB.Where("user_id = ? && date > ? && date <= ?", user_id, start_period, finish_period).Order("date asc").Find(&records).Error
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	period := map[string]time.Time{
-		"sales_period_start":  sales_period_start,
-		"sales_period_finish": sales_period_finish,
+		"sales_period_start":  start_period,
+		"sales_period_finish": finish_period,
 	}
 
-	return sales, dates, period, nil
+	return records, period, nil
 
 }
 
-/**
- * SearchRecordForMonth
- * recordsの検索
- * @params c *fiber.Ctx
- * @returns records []*models.Record
- */
-func SearchRecordForMonth(c *fiber.Ctx) ([]*model.Record, error) {
-	// params
-	year, _ := strconv.Atoi(c.Query("year"))
-	month, _ := strconv.Atoi(c.Query("month"))
-	var sales_period_start time.Time
-	var sales_period_finish time.Time
+func SalesData(records []*model.Record) ([]int64, []int64, []time.Time) {
+	var sales_data []int64
+	var sales_data_sum []int64
+	var dates []time.Time
 
-	user, err := GetUserFromQuery(c)
-	if err != nil {
-		return nil, err
+	// 売上一覧取得
+	for _, record := range records {
+		sales_data = append(sales_data, record.DailySales)
+		dates = append(dates, record.Date)
 	}
 
-	// user_idの取得
-	user_id := user.Id
-
-	// 給与日の取得
-	pay_day := user.PayDay
-
-	// 締め日の取得
-	close_day := user.CloseDay
-	var close_day_start int64
-	var close_day_finish int64
-
-	// 取得するデータの期間の確定
-	// 給与日が月をまたぐ場合
-	if pay_day-close_day < 0 {
-		// 開始期間の取得
-		if month == 1 {
-			year -= 1
-			month = 11
-		} else if month == 2 {
-			year -= 1
-			month = 12
-		} else {
-			month -= 2
-		}
-		if user.CloseDay == 31 {
-			date := AdjustmentCloseDay(year, month)
-			close_day_start = date
-		} else {
-			close_day_start = close_day
-		}
-		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 12, 0, 0, 0, time.Local)
-
-		// 終了期間の取得
-		if month == 12 {
-			year += 1
-			month = 1
-		} else {
-			month += 1
-		}
-		if user.CloseDay == 31 {
-			date := AdjustmentCloseDay(year, month)
-			close_day_finish = date
-		} else {
-			close_day_finish = close_day
-		}
-		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
-
-		// 給与日が月をまたがない場合
-	} else {
-		// 開始期間の取得
-		if month == 1 {
-			year -= 1
-			month = 12
-		} else {
-			month -= 1
-		}
-		if user.CloseDay == 31 {
-			date := AdjustmentCloseDay(year, month)
-			close_day_start = date
-		} else {
-			close_day_start = close_day
-		}
-		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 12, 0, 0, 0, time.Local)
-
-		// 終了期間の取得
-		if month == 12 {
-			year += 1
-			month = 1
-		} else {
-			month += 1
-		}
-		if user.CloseDay == 31 {
-			date := AdjustmentCloseDay(year, month)
-			close_day_finish = date
-		} else {
-			close_day_finish = close_day
-		}
-		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
+	// 売上合計値の取得
+	var sales_sum int64
+	for _, sales := range sales_data {
+		sales_sum += sales
+		sales_data_sum = append(sales_data_sum, sales_sum)
 	}
 
-	var records []*model.Record
-	err = db.DB.Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Find(&records).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return records, nil
+	return sales_data_sum, sales_data, dates
 }
 
 /**
