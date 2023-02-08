@@ -13,16 +13,16 @@ import (
 	"github.com/taiki-nd/taxi_log/utils/constants"
 )
 
-func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, error) {
+func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, map[string]time.Time, error) {
 
 	// params
 	//user_id, _ := strconv.Atoi(c.Query("user_id"))
 
 	// 日報売上一覧の取得
-	sales, dates, err := GetSalesIndex(c)
+	sales, dates, period, err := GetSalesIndex(c)
 	if err != nil {
 		log.Printf("db error: %v", err)
-		return nil, nil, fmt.Errorf(constants.DB_ERR)
+		return nil, nil, nil, fmt.Errorf(constants.DB_ERR)
 	}
 
 	var sales_sums []int64
@@ -32,7 +32,7 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, error) {
 		sales_sums = append(sales_sums, i)
 	}
 
-	return sales_sums, dates, nil
+	return sales_sums, dates, period, nil
 }
 
 /**
@@ -42,7 +42,7 @@ func DataSettingForSalesSum(c *fiber.Ctx) ([]int64, []time.Time, error) {
  * @return []int64
  * @return error
  */
-func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
+func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, map[string]time.Time, error) {
 	// params
 	year, _ := strconv.Atoi(c.Query("year"))
 	month, _ := strconv.Atoi(c.Query("month"))
@@ -51,7 +51,7 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 
 	user, err := GetUserFromQuery(c)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// userの取得
@@ -134,19 +134,27 @@ func GetSalesIndex(c *fiber.Ctx) ([]int64, []time.Time, error) {
 		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
 	}
 
+	fmt.Printf("sales_period_start %v \n", sales_period_start)
+	fmt.Printf("sales_period_finish %v \n", sales_period_finish)
+
 	var sales []int64
 	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Pluck("daily_sales", &sales).Error
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	var dates []time.Time
 	err = db.DB.Table("records").Where("user_id = ? && date > ? && date <= ?", user_id, sales_period_start, sales_period_finish).Order("date asc").Pluck("date", &dates).Error
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	return sales, dates, nil
+	period := map[string]time.Time{
+		"sales_period_start":  sales_period_start,
+		"sales_period_finish": sales_period_finish,
+	}
+
+	return sales, dates, period, nil
 
 }
 

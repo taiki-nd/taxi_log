@@ -30,13 +30,13 @@ func Analysis(c *fiber.Ctx) error {
 
 	// データ収集
 	// AnalysisSalesSum
-	sales_data_sum, dates_sum, err := service.DataSettingForSalesSum(c)
+	sales_data_sum, dates_sum, period, err := service.DataSettingForSalesSum(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
 	// AnalysisSales
-	sales_data, dates, err := service.GetSalesIndex(c)
+	sales_data, dates, _, err := service.GetSalesIndex(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
@@ -48,11 +48,14 @@ func Analysis(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
+	fmt.Println(period)
+
 	data := map[string]interface{}{
 		"home_sales_sum": sales_data_sum,
 		"dates_sum":      dates_sum,
 		"home_sales":     sales_data,
 		"dates":          dates,
+		"period":         period,
 		"records":        records,
 	}
 
