@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -74,6 +75,31 @@ func GetRankingData(c *fiber.Ctx) (interface{}, error) {
 			records_for_day = append(records_for_day, record)
 		}
 	}
+
+	//
+	// 勤務形態別に分類
+	//
+
+	// 1カ月分の分類
+	monthly_every_other_day_records, monthly_day_records, monthly_ranking_night_records := RecordsClassification(records_for_month)
+
+	// 1週間分の分類
+	weekly_every_other_day_records, weekly_day_records, weekly_ranking_night_records := RecordsClassification(records_for_week)
+
+	// 1日分の分類
+	daily_every_other_day_records, daily_day_records, daily_ranking_night_records := RecordsClassification(records_for_day)
+
+	fmt.Printf("monthly_every_other_day_records %v \n", monthly_every_other_day_records)
+	fmt.Printf("monthly_day_records%v \n", monthly_day_records)
+	fmt.Printf("monthly_ranking_night_records%v \n", monthly_ranking_night_records)
+
+	fmt.Printf("weekly_every_other_day_records%v \n", weekly_every_other_day_records)
+	fmt.Printf("weekly_day_records%v \n", weekly_day_records)
+	fmt.Printf("weekly_ranking_night_records%v \n", weekly_ranking_night_records)
+
+	fmt.Printf("daily_every_other_day_records%v \n", daily_every_other_day_records)
+	fmt.Printf("daily_day_records%v \n", daily_day_records)
+	fmt.Printf("daily_ranking_night_records%v \n", daily_ranking_night_records)
 
 	//
 	// ランキング情報の抽出
