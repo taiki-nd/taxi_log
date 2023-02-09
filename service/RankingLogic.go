@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+	"sort"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -92,17 +94,17 @@ func GetRankingData(c *fiber.Ctx) (interface{}, error) {
 	// ランキング情報の抽出
 	//
 
-	var daily_ranking_every_other_day_records []Record
-	var daily_ranking_day_records []Record
-	var daily_ranking_night_records []Record
+	monthly_ranking_every_other_day_records := RecordsSortByDailySales(monthly_every_other_day_records)
+	monthly_ranking_day_records := RecordsSortByDailySales(monthly_day_records)
+	monthly_ranking_night_records := RecordsSortByDailySales(monthly_night_records)
 
-	var weekly_ranking_every_other_day_records []Record
-	var weekly_ranking_day_records []Record
-	var weekly_ranking_night_records []Record
+	weekly_ranking_every_other_day_records := RecordsSortByDailySales(weekly_every_other_day_records)
+	weekly_ranking_day_records := RecordsSortByDailySales(weekly_day_records)
+	weekly_ranking_night_records := RecordsSortByDailySales(weekly_night_records)
 
-	var monthly_ranking_every_other_day_records []Record
-	var monthly_ranking_day_records []Record
-	var monthly_ranking_night_records []Record
+	daily_ranking_every_other_day_records := RecordsSortByDailySales(daily_every_other_day_records)
+	daily_ranking_day_records := RecordsSortByDailySales(daily_day_records)
+	daily_ranking_night_records := RecordsSortByDailySales(daily_night_records)
 
 	ranking_data := map[string]interface{}{
 		"daily_ranking_every_other_day_records":   daily_ranking_every_other_day_records,
@@ -115,6 +117,8 @@ func GetRankingData(c *fiber.Ctx) (interface{}, error) {
 		"monthly_ranking_day_records":             monthly_ranking_day_records,
 		"monthly_ranking_night_records":           monthly_ranking_night_records,
 	}
+
+	fmt.Printf("ranking_data: %v \n", ranking_data)
 
 	return ranking_data, nil
 }
@@ -131,28 +135,36 @@ func RecordsClassification(records []Record) ([]Record, []Record, []Record) {
 			records_day = append(records_day, record)
 		} else if record.StyleFlg == "night" {
 			records_night = append(records_night, record)
-		} else {
-			// nothing todo
 		}
 	}
 
 	return records_every_other_day, records_day, records_night
 }
 
-type Records []Record
+func RecordsSortByDailySales(records []Record) []Record {
+	var sortedRecords []Record
 
-func RecordSort(records []Record) {
+	// 売上のみ取得
+	var dailySalesArray []int
+	for _, record := range records {
+		dailySalesArray = append(dailySalesArray, int(record.DailySales))
+	}
 
-}
+	// 売上のソート
+	sort.Sort(sort.Reverse(sort.IntSlice(dailySalesArray)))
 
-func (r Records) Len() int {
-	return len(r)
-}
+	// recordのソート(上位5件のみ取得)
+	for _, dailySales := range dailySalesArray {
+		for _, record := range records {
+			if dailySales == int(record.DailySales) {
+				sortedRecords = append(sortedRecords, record)
+				break
+			}
+		}
+		if len(sortedRecords) == 5 {
+			break
+		}
+	}
 
-func (r Records) Swap(i, j int) {
-	r[i], r[j] = r[j], r[i]
-}
-
-func (r Records) Less(i, j int) bool {
-	return r[i].DailySales >= r[j].DailySales
+	return sortedRecords
 }
