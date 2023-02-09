@@ -60,7 +60,7 @@ func GetSalesIndex(c *fiber.Ctx) ([]*model.Record, map[string]time.Time, error) 
 		} else {
 			close_day_start = close_day
 		}
-		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 12, 0, 0, 0, time.Local)
+		sales_period_start = time.Date(year, time.Month(month), int(close_day_start), 0, 0, 0, 0, time.Local)
 
 		// 終了期間の取得
 		if month == 12 {
@@ -75,7 +75,7 @@ func GetSalesIndex(c *fiber.Ctx) ([]*model.Record, map[string]time.Time, error) 
 		} else {
 			close_day_finish = close_day
 		}
-		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 12, 0, 0, 0, time.Local)
+		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 0, 0, 0, 0, time.Local)
 
 		// 給与日が月をまたがない場合
 	} else {
@@ -110,14 +110,8 @@ func GetSalesIndex(c *fiber.Ctx) ([]*model.Record, map[string]time.Time, error) 
 		sales_period_finish = time.Date(year, time.Month(month), int(close_day_finish), 0, 0, 0, 0, time.Local)
 	}
 
-	fmt.Printf("sales_period_start %v \n", sales_period_start)
-	fmt.Printf("sales_period_finish %v \n", sales_period_finish)
-
 	start_period := sales_period_start.AddDate(0, 0, 2)
 	finish_period := sales_period_finish.AddDate(0, 0, 1)
-
-	fmt.Printf("start_period %v \n", start_period)
-	fmt.Printf("finish_period %v \n", finish_period)
 
 	var records []*model.Record
 	err = db.DB.Where("user_id = ? && date > ? && date <= ?", user_id, start_period, finish_period).Order("date asc").Find(&records).Error
