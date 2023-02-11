@@ -21,6 +21,7 @@ type ConfigList struct {
 	GcsKeyPath        string
 	StripePublicOkKey string
 	StripeSecretKey   string
+	FirebaseAuthPath  string
 	DiscordWebhookUrl string
 }
 
@@ -48,6 +49,7 @@ func init() {
 		GcsKeyPath:        cfg.Section("gcp").Key("gcs_key_path").String(),
 		StripePublicOkKey: cfg.Section("stripe").Key("public_ok_key").String(),
 		StripeSecretKey:   cfg.Section("stripe").Key("secret_key").String(),
+		FirebaseAuthPath:  cfg.Section("authentication").Key("firebase_service_key_path").String(),
 		DiscordWebhookUrl: cfg.Section("discord").Key("webhook_url").String(),
 	}
 }

@@ -47,5 +47,6 @@ func Routes(app *fiber.App) {
 	app.Get("/api/v1/ranking", controller.Ranking)
 
 	// stripe
+	app.Post("/api/v1/stripe/create_subscription", controller.CreateSubscription)
 	app.Post("/api/v1/stripe/cancel_subscription", controller.CancelSubscription)
 }
