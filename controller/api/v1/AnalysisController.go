@@ -10,7 +10,7 @@ import (
 )
 
 /**
- * Analysis
+ * Analysis(Home)
  */
 func Analysis(c *fiber.Ctx) error {
 	log.Println("start analysis (Home)")
@@ -28,31 +28,22 @@ func Analysis(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
 	}
 
-	// データ収集
-	// AnalysisSalesSum
-	sales_data_sum, dates_sum, err := service.DataSettingForSalesSum(c)
+	// records
+	records, period, err := service.GetSalesIndex(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
 
-	// AnalysisSales
-	sales_data, dates, err := service.GetSalesIndex(c)
-	if err != nil {
-		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
-	}
+	// sales_data
+	sales_data_sum, sales_data, dates := service.SalesData(records)
 
-	// GetRecords
-	// データ収集
-	records, err := service.SearchRecordForMonth(c)
-	if err != nil {
-		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
-	}
+	fmt.Println(period)
 
 	data := map[string]interface{}{
 		"home_sales_sum": sales_data_sum,
-		"dates_sum":      dates_sum,
 		"home_sales":     sales_data,
 		"dates":          dates,
+		"period":         period,
 		"records":        records,
 	}
 
@@ -70,7 +61,7 @@ func AnalysisPage(c *fiber.Ctx) error {
 	// 曜日別平均乗車回数
 	// 曜日別平均走行距離
 	// 乗車方式別平均売上
-	average_sales_per_day, average_occupancy_rate_per_day, err := service.GetAllAnalysisData(c)
+	average_sales_per_day, average_occupancy_rate_per_day, period_data, err := service.GetAllAnalysisData(c)
 	if err != nil {
 		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("db error: %v", err))
 	}
@@ -78,5 +69,6 @@ func AnalysisPage(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"average_sales_per_day":          average_sales_per_day,
 		"average_occupancy_rate_per_day": average_occupancy_rate_per_day,
+		"period_data":                    period_data,
 	})
 }
