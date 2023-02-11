@@ -19,6 +19,8 @@ type ConfigList struct {
 	GcsBucketName     string
 	GcsObjectPath     string
 	GcsKeyPath        string
+	StripePublicOkKey string
+	StripeSecretKey   string
 	DiscordWebhookUrl string
 }
 
@@ -44,6 +46,8 @@ func init() {
 		GcsBucketName:     cfg.Section("gcp").Key("gcs_bucket_name").String(),
 		GcsObjectPath:     cfg.Section("gcp").Key("gcs_object_path").String(),
 		GcsKeyPath:        cfg.Section("gcp").Key("gcs_key_path").String(),
+		StripePublicOkKey: cfg.Section("stripe").Key("public_ok_key").String(),
+		StripeSecretKey:   cfg.Section("stripe").Key("secret_key").String(),
 		DiscordWebhookUrl: cfg.Section("discord").Key("webhook_url").String(),
 	}
 }
