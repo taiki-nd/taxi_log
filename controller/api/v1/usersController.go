@@ -183,6 +183,7 @@ func UsersUpdate(c *fiber.Ctx) error {
 		"monthly_target":    user.MonthlyTarget,
 		"open_flg":          user.OpenFlg,
 		"is_admin":          user.IsAdmin,
+		"stripe_c_id":       user.StripeCId,
 	}
 
 	// user情報の更新

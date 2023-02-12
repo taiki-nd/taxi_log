@@ -68,6 +68,9 @@ func CreateSubscription(c *fiber.Ctx) error {
 		return service.ErrorResponse(c, []string{"create_subscription_err"}, fmt.Sprintf("create subscription err: %v", err))
 	}
 
+	// db登録
+	err := 
+
 	return service.SuccessResponse(c, []string{"success create subscription"}, sb, nil)
 
 }
