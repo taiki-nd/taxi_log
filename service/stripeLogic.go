@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 	stripe "github.com/stripe/stripe-go/v72"
@@ -19,7 +20,12 @@ type Product struct {
 }
 
 func CreateSubscription(c *fiber.Ctx, email string, uid string) (*stripe.Subscription, error) {
-	//card_number := c.Query("card_number")
+	number := c.Query("card_number")
+	expMonth := c.Query("exp_month")
+	expYear := c.Query("exp_year")
+	cvc := c.Query("cvc")
+
+	expYear = "20" + expYear
 
 	stripe.Key = config.Config.StripeSecretKey
 
@@ -45,6 +51,7 @@ func CreateSubscription(c *fiber.Ctx, email string, uid string) (*stripe.Subscri
 	}
 	customer, err := customer.New(paramsCustomer)
 	if err != nil {
+		log.Printf("create_customer_error: %v", err)
 		return nil, err
 	}
 	customerId := customer.ID
@@ -53,16 +60,31 @@ func CreateSubscription(c *fiber.Ctx, email string, uid string) (*stripe.Subscri
 	// 支払い方法の作成
 	paramsPaymentMethod := &stripe.PaymentMethodParams{
 		Card: &stripe.PaymentMethodCardParams{
-			Number:   stripe.String("4242424242424242"),
-			ExpMonth: stripe.String("8"),
-			ExpYear:  stripe.String("2020"),
-			CVC:      stripe.String("314"),
+			Number:   stripe.String(number),
+			ExpMonth: stripe.String(expMonth),
+			ExpYear:  stripe.String(expYear),
+			CVC:      stripe.String(cvc),
 		},
 		Type: stripe.String("card"),
 	}
-	paymentMethod, _ := paymentmethod.New(paramsPaymentMethod)
+	paymentMethod, err := paymentmethod.New(paramsPaymentMethod)
+	if err != nil {
+		log.Printf("pay_method_error: %v", err)
+		return nil, err
+	}
 	paymentMethodId := paymentMethod.ID
 	fmt.Printf("paymentMethodId %v \n", paymentMethodId)
+
+	// 支払い方法と顧客の紐付け
+	params := &stripe.PaymentMethodAttachParams{
+		Customer: stripe.String(customerId),
+	}
+	attachedPaymentMethod, err := paymentmethod.Attach(paymentMethodId, params)
+	if err != nil {
+		log.Printf("pay_method_attached_error: %v", err)
+		return nil, err
+	}
+	paymentMethodId = attachedPaymentMethod.ID
 
 	// subscriptionの作成
 	subscriptionParams := &stripe.SubscriptionParams{
@@ -77,6 +99,10 @@ func CreateSubscription(c *fiber.Ctx, email string, uid string) (*stripe.Subscri
 	}
 	sb, err := sub.New(subscriptionParams)
 	if err != nil {
+		if err != nil {
+			log.Printf("create_subscription_error: %v", err)
+			return nil, err
+		}
 		return nil, err
 	}
 
