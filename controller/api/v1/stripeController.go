@@ -69,7 +69,10 @@ func CreateSubscription(c *fiber.Ctx) error {
 	}
 
 	// db登録
-	err := 
+	err = service.UpdateUserForStartSubscription(uuid, sb)
+	if err != nil {
+		return service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("create subscription err: %v", err))
+	}
 
 	return service.SuccessResponse(c, []string{"success create subscription"}, sb, nil)
 

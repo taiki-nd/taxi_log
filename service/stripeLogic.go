@@ -11,6 +11,8 @@ import (
 	"github.com/stripe/stripe-go/v72/price"
 	"github.com/stripe/stripe-go/v72/sub"
 	"github.com/taiki-nd/taxi_log/config"
+	"github.com/taiki-nd/taxi_log/db"
+	"github.com/taiki-nd/taxi_log/model"
 )
 
 type Product struct {
@@ -107,4 +109,24 @@ func CreateSubscription(c *fiber.Ctx, email string, uid string) (*stripe.Subscri
 	}
 
 	return sb, nil
+}
+
+/*
+ * UpdateUserForStartSubscription
+ */
+func UpdateUserForStartSubscription(uuid string, subscription *stripe.Subscription) error {
+	// user情報取得
+	var user model.User
+	err := db.DB.Table("users").Where("uuid = ?", uuid).First(&user).Error
+	if err != nil {
+		return err
+	}
+
+	// user情報の更新
+	err = db.DB.Model(&user).Update("stripe_c_id", subscription.Customer.ID).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
