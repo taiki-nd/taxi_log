@@ -62,7 +62,10 @@ func CreateSubscription(c *fiber.Ctx) error {
 	}
 	email := user.Email
 
-	return service.SuccessResponse(c, []string{"success create subscription"}, email, nil)
+	// サブスクリプション処理
+	sb, err := service.CreateSubscription(c, email, uuid)
+
+	return service.SuccessResponse(c, []string{"success create subscription"}, sb, nil)
 
 }
 
