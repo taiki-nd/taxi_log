@@ -21,6 +21,9 @@ type Product struct {
 	Price     int64
 }
 
+/**
+ * CreateSubscription
+ */
 func CreateSubscription(c *fiber.Ctx, email string, uid string) (*stripe.Subscription, error) {
 	number := c.Query("card_number")
 	expMonth := c.Query("exp_month")
@@ -129,4 +132,17 @@ func UpdateUserForStartSubscription(uuid string, subscription *stripe.Subscripti
 	}
 
 	return nil
+}
+
+/**
+ * CancelSubscription
+ */
+func CancelSubscription(c *fiber.Ctx) (*stripe.Subscription, error) {
+	sub_id := c.Query("sub_id")
+	stripe.Key = config.Config.StripeSecretKey
+	s, err := sub.Cancel(sub_id, nil)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
 }

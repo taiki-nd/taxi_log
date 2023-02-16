@@ -7,8 +7,6 @@ import (
 
 	firebase "firebase.google.com/go"
 	"github.com/gofiber/fiber/v2"
-	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/sub"
 	"github.com/taiki-nd/taxi_log/config"
 	"github.com/taiki-nd/taxi_log/service"
 	"github.com/taiki-nd/taxi_log/utils/constants"
@@ -79,8 +77,24 @@ func CreateSubscription(c *fiber.Ctx) error {
 }
 
 func CancelSubscription(c *fiber.Ctx) error {
-	sub_id := c.Query("sub_id")
-	stripe.Key = config.Config.StripeSecretKey
-	s, _ := sub.Cancel(sub_id, nil)
+	// user認証
+	statuses, errs, err := service.UserAuth(c)
+	if err != nil {
+		log.Printf("user auth error: %v", err)
+		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("user auth error: %v", err))
+	}
+	if len(errs) != 0 {
+		log.Println(errs)
+	}
+	// signin確認
+	if !statuses[0] {
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
+	}
+
+	s, err := service.CancelSubscription(c)
+	if err != nil {
+		return service.ErrorResponse(c, []string{"cancel_subscription_error"}, fmt.Sprintf("cancel subscription error: %v", err))
+	}
+
 	return service.SuccessResponse(c, []string{"success_cancel_subscription"}, s, nil)
 }
