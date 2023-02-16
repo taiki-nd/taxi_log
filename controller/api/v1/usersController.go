@@ -184,6 +184,7 @@ func UsersUpdate(c *fiber.Ctx) error {
 		"open_flg":          user.OpenFlg,
 		"is_admin":          user.IsAdmin,
 		"stripe_c_id":       user.StripeCId,
+		"stripe_sub_id":     user.StripeSubId,
 	}
 
 	// user情報の更新

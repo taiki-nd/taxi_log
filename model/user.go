@@ -18,6 +18,7 @@ type User struct {
 	OpenFlg         string          `json:"open_flg" gorm:"not null; size:256; default:open"`
 	IsAdmin         bool            `json:"is_admin" gorm:"not null; default:false"`
 	StripeCId       string          `json:"stripe_c_id" gorm:"not null;"`
+	StripeSubId     string          `json:"stripe_sub_id" gorm:"not null"`
 	Records         []Record        `json:"records" gorm:"foreignKey:UserId"`
 	Followings      []UserFollowing `json:"followings" gorm:"foreignKey:UserId"`
 	Followers       []UserFollowing `json:"followers" gorm:"foreignKey:FollowingId"`

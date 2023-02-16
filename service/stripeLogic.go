@@ -126,7 +126,7 @@ func UpdateUserForStartSubscription(uuid string, subscription *stripe.Subscripti
 	}
 
 	// user情報の更新
-	err = db.DB.Model(&user).Update("stripe_c_id", subscription.Customer.ID).Error
+	err = db.DB.Model(&user).Updates(model.User{StripeCId: subscription.Customer.ID, StripeSubId: subscription.ID}).Error
 	if err != nil {
 		return err
 	}
@@ -138,9 +138,31 @@ func UpdateUserForStartSubscription(uuid string, subscription *stripe.Subscripti
  * CancelSubscription
  */
 func CancelSubscription(c *fiber.Ctx) (*stripe.Subscription, error) {
-	sub_id := c.Query("sub_id")
+	// headerの確認
+	var header AuthUser
+	err := c.ReqHeaderParser(&header)
+	if err != nil {
+		log.Println("reqHeader parse error")
+		return nil, err
+	}
+	uuid := header.Uuid
+
+	// DBからcustomerIdとsubscriptionIdの取得
+	stripeInfo := struct {
+		StripeCId   string
+		StripeSubId string
+	}{}
+	err = db.DB.Table("users").Where("uuid = ?", uuid).Find(&stripeInfo).Error
+	if err != nil {
+		return nil, fmt.Errorf("db_error")
+	}
+
+	if stripeInfo.StripeSubId == "" {
+		return nil, fmt.Errorf("not_premium_plan")
+	}
+
 	stripe.Key = config.Config.StripeSecretKey
-	s, err := sub.Cancel(sub_id, nil)
+	s, err := sub.Cancel(stripeInfo.StripeSubId, nil)
 	if err != nil {
 		return nil, err
 	}
