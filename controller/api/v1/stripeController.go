@@ -46,11 +46,20 @@ func CreateSubscription(c *fiber.Ctx) error {
 		log.Fatalf("error initializing app: %v\n", err)
 	}
 
+	// userのstripe情報の取得
+	subId, err := service.GetUserInfoForStripe(uuid)
+	if err != nil {
+		service.ErrorResponse(c, []string{constants.DB_ERR}, fmt.Sprintf("get user info err: %v", err))
+	}
+
 	// Get an auth client from the firebase.App
 	client, err := app.Auth(ctx)
 	if err != nil {
 		log.Printf("error getting Auth client: %v\n", err)
 		return service.ErrorResponse(c, []string{constants.USER_AUTH_ERROR}, fmt.Sprintf("firebase auth client error: %v", err))
+	}
+	if subId != "" {
+		return service.ErrorResponse(c, []string{"already_premium_plan"}, fmt.Sprintf("already premium plan: %v", err))
 	}
 
 	user, err := client.GetUser(ctx, uuid)

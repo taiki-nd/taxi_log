@@ -22,6 +22,20 @@ type Product struct {
 }
 
 /**
+ * GetUserInfoForStripe
+ */
+func GetUserInfoForStripe(uuid string) (string, error) {
+	// user情報取得
+	var user model.User
+	err := db.DB.Table("users").Where("uuid = ?", uuid).First(&user).Error
+	if err != nil {
+		return "", err
+	}
+
+	return user.StripeSubId, nil
+}
+
+/**
  * CreateSubscription
  */
 func CreateSubscription(c *fiber.Ctx, email string, uid string) (*stripe.Subscription, error) {
@@ -138,6 +152,7 @@ func UpdateUserForStartSubscription(uuid string, subscription *stripe.Subscripti
  * CancelSubscription
  */
 func CancelSubscription(c *fiber.Ctx) (*stripe.Subscription, error) {
+	fmt.Println("start cancel sub")
 	// headerの確認
 	var header AuthUser
 	err := c.ReqHeaderParser(&header)
@@ -146,6 +161,13 @@ func CancelSubscription(c *fiber.Ctx) (*stripe.Subscription, error) {
 		return nil, err
 	}
 	uuid := header.Uuid
+
+	// user情報取得
+	var user model.User
+	err = db.DB.Table("users").Where("uuid = ?", uuid).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
 
 	// DBからcustomerIdとsubscriptionIdの取得
 	stripeInfo := struct {
@@ -157,14 +179,29 @@ func CancelSubscription(c *fiber.Ctx) (*stripe.Subscription, error) {
 		return nil, fmt.Errorf("db_error")
 	}
 
-	if stripeInfo.StripeSubId == "" {
+	if stripeInfo.StripeSubId == "" || stripeInfo.StripeCId == "" {
 		return nil, fmt.Errorf("not_premium_plan")
 	}
 
 	stripe.Key = config.Config.StripeSecretKey
+
+	// サブスクリプションのキャンセル
 	s, err := sub.Cancel(stripeInfo.StripeSubId, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	// カスタマーの削除
+	cus, err := customer.Del(user.StripeCId, nil)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("success delete customer form stripe: %v", cus)
+
+	err = db.DB.Debug().Model(&user).Updates(model.User{StripeCId: "", StripeSubId: ""}).Error
+	if err != nil {
+		return nil, err
+	}
+
 	return s, nil
 }
