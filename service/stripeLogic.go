@@ -196,9 +196,12 @@ func CancelSubscription(c *fiber.Ctx) (*stripe.Subscription, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("success delete customer form stripe: %v", cus)
+	log.Printf("success delete customer form stripe: %v", *cus)
 
-	err = db.DB.Debug().Model(&user).Updates(model.User{StripeCId: "", StripeSubId: ""}).Error
+	// user情報の更新
+	user.StripeCId = ""
+	user.StripeSubId = ""
+	err = db.DB.Save(&user).Error
 	if err != nil {
 		return nil, err
 	}
