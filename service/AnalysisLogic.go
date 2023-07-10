@@ -254,7 +254,7 @@ func AnalysisAverageSalesPerDay(records []model.Record) []int64 {
 	for _, sale_index := range tue_sales_index {
 		tue_sum += sale_index
 	}
-	tue_ave = mon_sum / int64(len(tue_sales_index))
+	tue_ave = tue_sum / int64(len(tue_sales_index))
 
 	for _, sale_index := range wed_sales_index {
 		wed_sum += sale_index
@@ -343,7 +343,7 @@ func AnalysisAverageOccupancyRatePerDay(records []model.Record) []float64 {
 	for _, occupancy_rate_index := range tue_occupancy_rate_index {
 		tue_sum += occupancy_rate_index
 	}
-	tue_ave = mon_sum / float64(len(tue_occupancy_rate_index))
+	tue_ave = tue_sum / float64(len(tue_occupancy_rate_index))
 
 	for _, occupancy_rate_index := range wed_occupancy_rate_index {
 		wed_sum += occupancy_rate_index
