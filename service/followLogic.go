@@ -25,15 +25,18 @@ func IsFollower(c *fiber.Ctx) (bool, error) {
 	// 変数確認
 	sign_in_user, _ := GetUserFromUuid(c)
 	id := c.Params("id")
-	var follow model.UserFollowing
 
 	// follow関係の確認
-	err := db.DB.Table("user_followings").Where("user_id = ?", sign_in_user.Id).Where("following_id = ?", id).Where("permission = ?", true).First(&follow).Error
+	var follow model.UserFollowing
+	err := db.DB.Table("user_followings").
+		Where("user_id = ?", sign_in_user.Id).
+		Where("following_id = ?", id).
+		Where("permission = ?", true).
+		First(&follow).Error
 	if err != nil {
 		return false, fmt.Errorf("follow_relationship_error: %v", err)
-	} else {
-		return true, nil
 	}
+	return true, nil
 }
 
 /**
@@ -47,7 +50,6 @@ func IsFollowerForRecord(c *fiber.Ctx, record *model.Record) (bool, error) {
 	// 変数確認
 	sign_in_user, _ := GetUserFromUuid(c)
 	recorded_user_id := record.UserId
-	var follow model.UserFollowing
 
 	// 本人の場合follower判定を行わない
 	if sign_in_user.Id == recorded_user_id {
@@ -55,10 +57,15 @@ func IsFollowerForRecord(c *fiber.Ctx, record *model.Record) (bool, error) {
 	}
 
 	// follow関係の確認
-	err := db.DB.Table("user_followings").Where("user_id = ?", sign_in_user.Id).Where("following_id = ?", recorded_user_id).Where("permission = ?", true).First(&follow).Error
+	var follow model.UserFollowing
+	err := db.DB.Table("user_followings").
+		Where("user_id = ?", sign_in_user.Id).
+		Where("following_id = ?", recorded_user_id).
+		Where("permission = ?", true).
+		First(&follow).
+		Error
 	if err != nil {
 		return false, fmt.Errorf("follow_relationship_error: %v", err)
-	} else {
-		return true, nil
 	}
+	return true, nil
 }
