@@ -22,3 +22,12 @@ type Record struct {
 	CreatedAt         time.Time `json:"created_at"`
 	UpdatedAt         time.Time `json:"updated_at"`
 }
+
+func (r *Record) ValidStyleFlg() bool {
+	switch r.StyleFlg {
+	case "every_other_day", "day", "night", "other":
+		return true
+	default:
+		return false
+	}
+}

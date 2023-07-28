@@ -30,22 +30,22 @@ func SearchDetail(c *fiber.Ctx, adminStatus bool) ([]*model.Detail, error) {
 
 	// クエリの作成
 	detailSearch := db.DB.Where("")
-	if len(depart_hour) != 0 {
+	if !IsEmptyString(depart_hour) {
 		detailSearch.Where("depart_hour = ?", depart_hour)
 	}
-	if len(depart_place) != 0 {
+	if !IsEmptyString(depart_place) {
 		detailSearch.Where("depart_place LIKE ?", "%"+depart_place+"%")
 	}
-	if len(arrive_place) != 0 {
+	if !IsEmptyString(arrive_place) {
 		detailSearch.Where("arrive_place LIKE ?", "%"+arrive_place+"%")
 	}
-	if len(sales) != 0 {
+	if !IsEmptyString(sales) {
 		detailSearch.Where("sales >= ?", sales)
 	}
-	if len(method_flg) != 0 {
+	if !IsEmptyString(method_flg) {
 		detailSearch.Where("method_flg = ?", method_flg)
 	}
-	if len(description) != 0 {
+	if !IsEmptyString(description) {
 		detailSearch.Where("description LIKE ?", "%"+description+"%")
 	}
 	// 対象record_idのdetailsの取得
@@ -70,17 +70,17 @@ func DetailValidation(detail *model.Detail) (bool, []string) {
 	var errs []string
 
 	// depart_hour
-	if detail.DepartHour < 0 || 24 < detail.DepartHour {
+	if !IsValidHour(detail.DepartHour)
 		log.Println("depart_hour range error")
 		errs = append(errs, "depart_hour_range_error")
 	}
 	// depart_place
-	if len(detail.DepartPlace) == 0 {
+	if IsEmptyString(detail.DepartPlace) {
 		log.Println("depart_place null error")
 		errs = append(errs, "depart_place_null_error")
 	}
 	// arrive_place
-	if len(detail.DepartPlace) == 0 {
+	if IsEmptyString(detail.ArrivePlace) {
 		log.Println("arrive_place null error")
 		errs = append(errs, "arrive_place_null_error")
 	}
@@ -90,11 +90,11 @@ func DetailValidation(detail *model.Detail) (bool, []string) {
 		errs = append(errs, "sales_range_error")
 	}
 	// method_flg
-	if len(detail.MethodFlg) == 0 {
+	if IsEmptyString(detail.MethodFlg) {
 		log.Println("method_flg null error")
 		errs = append(errs, "method_flg_null_error")
 	} else {
-		if !(detail.MethodFlg == "flow" || detail.MethodFlg == "wait" || detail.MethodFlg == "app" || detail.MethodFlg == "wireless" || detail.MethodFlg == "own" || detail.MethodFlg == "other") {
+		if !detail.ValidMethodFlg() {
 			log.Println("specified word error(method_flg)")
 			errs = append(errs, "specified_word_error(method_flg)")
 		}
@@ -104,7 +104,6 @@ func DetailValidation(detail *model.Detail) (bool, []string) {
 	if len(errs) != 0 {
 		return false, errs
 	}
-
 	return true, nil
 }
 

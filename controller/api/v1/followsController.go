@@ -26,9 +26,9 @@ func Followings(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "record not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "record not sign in")
 	}
 	// user合致確認
 	if !statuses[2] {
@@ -74,9 +74,9 @@ func Followers(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "record not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "record not sign in")
 	}
 	// user合致確認
 	if !statuses[2] {
@@ -122,9 +122,9 @@ func Follow(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "record not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "record not sign in")
 	}
 	// user合致確認
 	if !statuses[2] {
@@ -166,9 +166,9 @@ func DeleteFollowing(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "record not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "record not sign in")
 	}
 	// user合致確認
 	if !statuses[2] {
@@ -207,9 +207,9 @@ func FollowPermission(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "record not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "record not sign in")
 	}
 	// user合致確認
 	if !statuses[2] {

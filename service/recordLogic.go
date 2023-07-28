@@ -29,19 +29,19 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 
 	// クエリの作成
 	recordSearch := db.DB.Where("")
-	if len(date) != 0 {
+	if !IsEmptyString(date) {
 		recordSearch.Where("date = ?", date)
 	}
-	if len(day_of_week) != 0 {
+	if !IsEmptyString(day_of_week) {
 		recordSearch.Where("day_of_week = ?", day_of_week)
 	}
-	if len(style_flg) != 0 {
+	if !IsEmptyString(style_flg) {
 		recordSearch.Where("style_flg = ?", style_flg)
 	}
-	if len(occupancy_rate) != 0 {
+	if !IsEmptyString(occupancy_rate) { // TODO: string に比較演算使っている. バグでは？
 		recordSearch.Where("occupancy_rate >= ?", occupancy_rate)
 	}
-	if len(daily_sales) != 0 {
+	if !IsEmptyString(daily_sales) { // TODO: string に等号使っている. バグでは？
 		recordSearch.Where("daily_sales >= ?", daily_sales)
 	}
 	// admin権限の確認
@@ -59,7 +59,11 @@ func SearchRecord(c *fiber.Ctx, adminStatus bool) ([]*model.Record, error) {
 	offset := (page - 1) * limit
 
 	// recordsレコードの取得
-	err = recordSearch.Order("date desc").Offset(offset).Limit(limit).Find(&records).Error
+	err = recordSearch.Order("date desc").
+		Offset(offset).
+		Limit(limit).
+		Find(&records).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -77,29 +81,29 @@ func RecordValidation(record *model.Record) (bool, []string) {
 	var errs []string
 
 	// day_of_week
-	if len(record.DayOfWeek) == 0 {
+	if IsEmptyString(record.DayOfWeek) {
 		log.Println("day_of_week null error")
 		errs = append(errs, "day_of_week_null_error")
 	}
 	// style_flg
-	if len(record.StyleFlg) == 0 {
+	if IsEmptyString(record.StyleFlg) {
 		log.Println("style_flg null error")
 		errs = append(errs, "style_flg_null_error")
 	} else {
-		if !(record.StyleFlg == "every_other_day" || record.StyleFlg == "day" || record.StyleFlg == "night" || record.StyleFlg == "other") {
+		if !record.ValidStyleFlg() {
 			log.Println("specified word error(style_flg)")
 			errs = append(errs, "specified_word_error(style_flg)")
 		}
 	}
 
 	// start_hour
-	if record.StartHour < 0 || 24 < record.StartHour {
+	if !IsValidHour(record.StartHour) {
 		log.Println("start hour number error")
 		errs = append(errs, "start_hour_number_error")
 	}
 
 	// running_time
-	if record.RunningTime < 0 || 24 < record.RunningTime {
+	if !IsValidHour(record.RunningTime) {
 		log.Println("running time number error")
 		errs = append(errs, "running_time_number_error")
 	}
@@ -117,7 +121,7 @@ func RecordValidation(record *model.Record) (bool, []string) {
 	}
 
 	// occupancy_rate
-	if record.OccupancyRate < 0 || 100 < record.OccupancyRate {
+	if !IsValidRate(record.OccupancyRate) {
 		log.Println("occupancy rate number error")
 		errs = append(errs, "occupancy_rate_number_error")
 	}

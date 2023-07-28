@@ -28,9 +28,9 @@ func UsersIndex(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not sign in")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "user not sign in")
 	}
 
 	// userの検索
@@ -60,9 +60,9 @@ func UsersShow(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "user not sign in")
 	}
 
 	// admin権限の確認
@@ -140,9 +140,9 @@ func UsersUpdate(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "user not sign in")
 	}
 	// user合致確認
 	if !statuses[2] {
@@ -212,9 +212,9 @@ func UsersDelete(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "user not sign in")
 	}
 	// admin権限の確認
 	if !statuses[1] {
