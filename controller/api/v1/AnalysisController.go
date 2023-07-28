@@ -23,9 +23,9 @@ func Analysis(c *fiber.Ctx) error {
 	if len(errs) != 0 {
 		log.Println(errs)
 	}
-	// signin確認
+	// sign in確認
 	if !statuses[0] {
-		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGININ}, "user not signin")
+		return service.ErrorResponse(c, []string{constants.USER_NOT_SIGN_IN}, "user not sign in")
 	}
 
 	// records
