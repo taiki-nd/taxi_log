@@ -15,3 +15,12 @@ type Detail struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+func (d *Detail) ValidMethodFlg() bool {
+	switch d.MethodFlg {
+	case "wait", "app", "wireless", "own", "other":
+		return true
+	default:
+		return false
+	}
+}
