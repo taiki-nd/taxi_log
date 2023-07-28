@@ -52,7 +52,7 @@ func UserAuth(c *fiber.Ctx) ([]bool, []string, error) {
 		log.Printf("db_error: %v", err)
 		return statuses, errs, err
 	}
-	if authUser.IsAdmin {
+	if authUser.IsAdmin { // TODO: バグ疑い. 処理が不整合
 		statuses = append(statuses, true)
 		errs = append(errs, "user_admin")
 		statuses = append(statuses, false)
